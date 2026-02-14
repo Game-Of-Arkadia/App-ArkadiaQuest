@@ -36,12 +36,12 @@ export function DialogueCard({ dialogue, characters, onUpdate, onDelete }: Dialo
             onValueChange={(v) => onUpdate({ characterId: v })}
           >
             <SelectTrigger className="h-8 text-xs w-48">
-              <SelectValue placeholder="Select NPC…" />
+              <SelectValue placeholder="Selectionner un PNJ" />
             </SelectTrigger>
             <SelectContent>
               {characters.map((c) => (
                 <SelectItem key={c.id} value={c.id}>
-                  {c.name} (#{c.characterId}, {c.gameName})
+                  {c.name} ({c.npcCode})
                 </SelectItem>
               ))}
             </SelectContent>
@@ -52,7 +52,7 @@ export function DialogueCard({ dialogue, characters, onUpdate, onDelete }: Dialo
         </Button>
       </div>
       <Textarea
-        placeholder="Enter dialogue content…"
+        placeholder="Texte du dialogue…"
         value={dialogue.text}
         onChange={(e) => onUpdate({ text: e.target.value })}
         className="min-h-[80px] text-sm resize-y"
