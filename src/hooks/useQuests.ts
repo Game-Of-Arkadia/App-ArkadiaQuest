@@ -15,13 +15,22 @@ function load<T>(key: string, fallback: T[]): T[] {
 
 // Migrate old quests that had top-level dialogues into a single step
 function migrateQuest(q: Quest): Quest {
-  if (!q.steps) {
+  const migrated = { ...q };
+  if (!migrated.steps) {
     const oldDialogues = (q as any).dialogues ?? [];
-    return { ...q, steps: oldDialogues.length > 0
+    migrated.steps = oldDialogues.length > 0
       ? [{ id: crypto.randomUUID(), type: "talk_to_character" as const, data: { characterId: "" }, dialogues: oldDialogues }]
-      : [], dialogues: undefined };
+      : [];
+    migrated.dialogues = undefined;
   }
-  return q;
+  if (!migrated.description) migrated.description = "";
+  if (!migrated.startingCharacterId) migrated.startingCharacterId = "";
+  if (!migrated.requirements) migrated.requirements = [];
+  if (!migrated.status) migrated.status = "to_do";
+  if (!migrated.referent) migrated.referent = "";
+  if (!migrated.writer) migrated.writer = "";
+  if (!migrated.notes) migrated.notes = [];
+  return migrated;
 }
 
 export function useQuests() {
