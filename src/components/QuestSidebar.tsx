@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, ChevronDown, ChevronRight, Trash2, Pencil, Scroll } from "lucide-react";
+import { Plus, ChevronDown, ChevronRight, Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -15,7 +15,8 @@ interface QuestSidebarProps {
   onAddGroup: (name: string) => void;
   onRenameGroup: (id: string, name: string) => void;
   onDeleteGroup: (id: string) => void;
-  onAddQuest: (groupId: string, name: string, questId: string) => void;
+  onCreateQuest: (groupId: string) => void;
+  onEditQuest: (quest: Quest) => void;
   onRenameQuest: (id: string, name: string) => void;
   onDeleteQuest: (id: string) => void;
 }
@@ -28,34 +29,20 @@ export function QuestSidebar({
   onAddGroup,
   onRenameGroup,
   onDeleteGroup,
-  onAddQuest,
+  onCreateQuest,
+  onEditQuest,
   onRenameQuest,
   onDeleteQuest,
 }: QuestSidebarProps) {
   const [newGroupName, setNewGroupName] = useState("");
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
-  const [editingQuestId, setEditingQuestId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
-  const [addingQuestGroupId, setAddingQuestGroupId] = useState<string | null>(null);
-  const [newQuestName, setNewQuestName] = useState("");
 
   const handleAddGroup = () => {
     const name = newGroupName.trim();
     if (!name) return;
     onAddGroup(name);
     setNewGroupName("");
-  };
-
-  const [newQuestId, setNewQuestId] = useState("");
-
-  const handleAddQuest = (groupId: string) => {
-    const name = newQuestName.trim();
-    const questId = newQuestId.trim();
-    if (!name || !questId) return;
-    onAddQuest(groupId, name, questId);
-    setNewQuestName("");
-    setNewQuestId("");
-    setAddingQuestGroupId(null);
   };
 
   const startEditGroup = (g: QuestGroup) => {
@@ -70,24 +57,14 @@ export function QuestSidebar({
     setEditingGroupId(null);
   };
 
-  const startEditQuest = (q: Quest) => {
-    setEditingQuestId(q.id);
-    setEditValue(q.name);
-  };
 
-  const commitEditQuest = () => {
-    if (editingQuestId && editValue.trim()) {
-      onRenameQuest(editingQuestId, editValue.trim());
-    }
-    setEditingQuestId(null);
-  };
 
   return (
     <aside className="w-64 border-r bg-muted/30 flex flex-col shrink-0">
       <div className="p-3 border-b">
         <div className="flex gap-1">
           <Input
-            placeholder="New group…"
+            placeholder="Nom du groupe..."
             value={newGroupName}
             onChange={(e) => setNewGroupName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAddGroup()}
@@ -102,7 +79,7 @@ export function QuestSidebar({
       <ScrollArea className="flex-1">
         <div className="p-2 space-y-1">
           {groups.length === 0 && (
-            <p className="text-xs text-muted-foreground text-center py-8">No groups yet</p>
+            <p className="text-xs text-muted-foreground text-center py-8">Aucun groupe</p>
           )}
           {groups.map((group) => {
             const groupQuests = quests.filter((q) => q.groupId === group.id);
@@ -160,30 +137,14 @@ export function QuestSidebar({
                         )}
                         onClick={() => onSelectQuest(quest.id)}
                       >
-                        <Scroll className="h-3 w-3 shrink-0 opacity-50" />
-                        {editingQuestId === quest.id ? (
-                          <Input
-                            autoFocus
-                            value={editValue}
-                            onChange={(e) => setEditValue(e.target.value)}
-                            onBlur={commitEditQuest}
-                            onKeyDown={(e) => {
-                              e.stopPropagation();
-                              if (e.key === "Enter") commitEditQuest();
-                            }}
-                            onClick={(e) => e.stopPropagation()}
-                            className="h-5 text-xs flex-1"
-                          />
-                        ) : (
-                          <span className="flex-1 truncate">{quest.name}</span>
-                        )}
+                        <span className="flex-1 truncate">#{quest.id}: {quest.name}</span>
                         <Button
                           variant="ghost"
                           size="icon"
                           className="h-4 w-4 opacity-0 group-hover/quest:opacity-100"
                           onClick={(e) => {
                             e.stopPropagation();
-                            startEditQuest(quest);
+                            onEditQuest(quest);
                           }}
                         >
                           <Pencil className="h-2 w-2" />
@@ -202,40 +163,14 @@ export function QuestSidebar({
                       </div>
                     ))}
 
-                    {addingQuestGroupId === group.id ? (
-                      <div className="space-y-1 mt-1">
-                        <Input
-                          autoFocus
-                          placeholder="Quest ID…"
-                          value={newQuestId}
-                          onChange={(e) => setNewQuestId(e.target.value)}
-                          className="h-6 text-xs"
-                        />
-                        <Input
-                          placeholder="Quest name…"
-                          value={newQuestName}
-                          onChange={(e) => setNewQuestName(e.target.value)}
-                          onKeyDown={(e) => e.key === "Enter" && handleAddQuest(group.id)}
-                          onBlur={() => { if (!newQuestName && !newQuestId) setAddingQuestGroupId(null); }}
-                          className="h-6 text-xs"
-                        />
-                        <Button size="sm" variant="outline" className="h-6 text-xs w-full" onClick={() => handleAddQuest(group.id)}>
-                          Create
-                        </Button>
-                      </div>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 text-xs w-full justify-start opacity-60 hover:opacity-100"
-                        onClick={() => {
-                          setAddingQuestGroupId(group.id);
-                          setNewQuestName("");
-                        }}
-                      >
-                        <Plus className="h-3 w-3 mr-1" /> Add quest
-                      </Button>
-                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 text-xs w-full justify-start opacity-60 hover:opacity-100"
+                      onClick={() => onCreateQuest(group.id)}
+                    >
+                      <Plus className="h-3 w-3 mr-1" /> Créer une quête
+                    </Button>
                   </div>
                 </CollapsibleContent>
               </Collapsible>
