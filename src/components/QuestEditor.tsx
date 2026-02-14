@@ -134,11 +134,11 @@ export function QuestEditor({
           </div>
           <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
             <span>ID: {quest.id}</span>
-            {startingChar && <span>Start: {startingChar.name}</span>}
+            {startingChar && <span>PNJ de départ → #{startingChar.characterId}: {startingChar.name}</span>}
             {quest.requirements.length > 0 && <span>{quest.requirements.length} requirement(s)</span>}
           </div>
           {quest.description && (
-            <p className="text-xs text-muted-foreground mt-1 max-w-lg">{quest.description}</p>
+            <p className="text-sm text-muted-foreground mt-3 max-w-lg">Description: {quest.description}</p>
           )}
         </div>
 
