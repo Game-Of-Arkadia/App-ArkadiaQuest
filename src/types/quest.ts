@@ -1,16 +1,57 @@
+export type CharacterGender = "male" | "female";
+
 export interface Character {
   id: string;
   name: string;
   characterId: string;
-  gameName: string;
+  npcCode: string;
   imagePath: string;
+  gender: CharacterGender;
+  x: number;
+  y: number;
+  z: number;
+  otherInfo: string;
   yamlConfig: string;
 }
+
+export const DEFAULT_YAML_CONFIG = `# Default character YAML configuration
+type: default
+behavior:
+  idle: true
+  interact: true`;
+
+export const AMBIANT_YAML_CONFIG = `# Ambiant character YAML configuration
+type: ambiant
+behavior:
+  idle: true
+  interact: false
+  ambient: true`;
 
 export interface Dialogue {
   id: string;
   characterId: string;
   text: string;
+}
+
+// Requirement types — extensible: add new type strings + matching data interfaces
+export type RequirementType = "finish_quest";
+
+export interface FinishQuestRequirement {
+  type: "finish_quest";
+  questId: string;
+}
+
+export type QuestRequirement = FinishQuestRequirement;
+
+export const REQUIREMENT_TYPE_LABELS: Record<RequirementType, string> = {
+  finish_quest: "Finir la quête",
+};
+
+export function defaultRequirementData(type: RequirementType): QuestRequirement {
+  switch (type) {
+    case "finish_quest":
+      return { type: "finish_quest", questId: "" };
+  }
 }
 
 // Step types — extensible: add new type strings + matching data interfaces
@@ -36,11 +77,45 @@ export interface QuestStep {
   dialogues: Dialogue[];
 }
 
+// Quest status — extensible: add new statuses here
+export const QUEST_STATUSES = [
+  "to_do",
+  "in_writing",
+  "problem",
+  "finishing",
+  "finished",
+] as const;
+
+export type QuestStatus = (typeof QUEST_STATUSES)[number];
+
+export const QUEST_STATUS_LABELS: Record<QuestStatus, string> = {
+  to_do: "A faire",
+  in_writing: "En cours",
+  problem: "Problème",
+  finishing: "A finaliser",
+  finished: "Terminée",
+};
+
+// Notes
+export interface QuestNote {
+  id: string;
+  content: string;
+  creator: string;
+  createdAt: string; // ISO timestamp
+}
+
 export interface Quest {
   id: string;
   name: string;
   groupId: string;
+  description: string;
+  startingCharacterId: string;
+  requirements: QuestRequirement[];
   steps: QuestStep[];
+  status: QuestStatus;
+  referent: string;
+  writer: string;
+  notes: QuestNote[];
   /** @deprecated kept for migration — new quests use steps */
   dialogues?: Dialogue[];
 }
@@ -61,6 +136,6 @@ export function defaultStepData(type: StepType): StepData {
 }
 
 export const STEP_TYPE_LABELS: Record<StepType, string> = {
-  go_somewhere: "Go Somewhere",
-  talk_to_character: "Talk to an NPC",
+  go_somewhere: "Aller à un certain endroit",
+  talk_to_character: "Parler à un NPC",
 };
