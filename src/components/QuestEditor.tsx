@@ -1,18 +1,25 @@
 import { useState } from "react";
-import { Plus, MessageSquare } from "lucide-react";
+import { Plus, Settings2, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { StepCard } from "@/components/StepCard";
-import type { Character, Quest, QuestStep, Dialogue, StepType } from "@/types/quest";
-import { defaultStepData, STEP_TYPE_LABELS } from "@/types/quest";
+import type { Character, Quest, QuestStep, Dialogue, StepType, QuestNote, QuestStatus } from "@/types/quest";
+import { defaultStepData, STEP_TYPE_LABELS, QUEST_STATUS_LABELS, QUEST_STATUSES } from "@/types/quest";
 
 interface QuestEditorProps {
   quest: Quest | null;
   characters: Character[];
+  quests: Quest[];
+  users: string[];
+  currentUser: string;
   onUpdateQuest: (id: string, updates: Partial<Quest>) => void;
+  onEditQuestProperties: () => void;
   onAddStep: (questId: string, step: QuestStep) => void;
   onUpdateStep: (questId: string, stepId: string, updates: Partial<QuestStep>) => void;
   onDeleteStep: (questId: string, stepId: string) => void;
@@ -23,10 +30,22 @@ interface QuestEditorProps {
 
 const STEP_TYPES: StepType[] = ["go_somewhere", "talk_to_character"];
 
+const STATUS_COLORS: Record<QuestStatus, string> = {
+  to_do: "bg-muted text-muted-foreground",
+  in_writing: "bg-primary/10 text-primary",
+  problem: "bg-destructive/10 text-destructive",
+  finishing: "bg-accent text-accent-foreground",
+  finished: "bg-primary/20 text-primary",
+};
+
 export function QuestEditor({
   quest,
   characters,
+  quests,
+  users,
+  currentUser,
   onUpdateQuest,
+  onEditQuestProperties,
   onAddStep,
   onUpdateStep,
   onDeleteStep,
@@ -35,14 +54,13 @@ export function QuestEditor({
   onDeleteStepDialogue,
 }: QuestEditorProps) {
   const [editingName, setEditingName] = useState(false);
-  const [editingId, setEditingId] = useState(false);
+  const [noteText, setNoteText] = useState("");
 
   if (!quest) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center space-y-2">
-          <MessageSquare className="h-10 w-10 mx-auto text-muted-foreground/40" />
-          <p className="text-muted-foreground text-sm">Select or create a quest to start working.</p>
+          <p className="text-muted-foreground text-sm">Select or create a quest to begin.</p>
         </div>
       </div>
     );
@@ -57,93 +75,206 @@ export function QuestEditor({
     });
   };
 
+  const handleAddNote = () => {
+    if (!noteText.trim()) return;
+    const newNote: QuestNote = {
+      id: crypto.randomUUID(),
+      content: noteText.trim(),
+      creator: currentUser,
+      createdAt: new Date().toISOString(),
+    };
+    onUpdateQuest(quest.id, { notes: [...(quest.notes || []), newNote] });
+    setNoteText("");
+  };
+
+  const handleDeleteNote = (noteId: string) => {
+    onUpdateQuest(quest.id, { notes: (quest.notes || []).filter((n) => n.id !== noteId) });
+  };
+
+  const startingChar = characters.find((c) => c.id === quest.startingCharacterId);
+
   return (
-    <div className="flex-1 flex flex-col min-h-0">
-      <div className="p-4 border-b shrink-0 space-y-1">
-        <div className="flex items-center gap-3">
-          {editingName ? (
-            <Input
-              autoFocus
-              defaultValue={quest.name}
-              onBlur={(e) => {
-                const v = e.target.value.trim();
-                if (v) onUpdateQuest(quest.id, { name: v });
-                setEditingName(false);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const v = (e.target as HTMLInputElement).value.trim();
+    <div className="flex-1 flex min-h-0">
+      {/* Main steps area */}
+      <div className="flex-1 flex flex-col min-h-0">
+        <div className="p-4 border-b shrink-0">
+          <div className="flex items-center gap-3">
+            {editingName ? (
+              <Input
+                autoFocus
+                defaultValue={quest.name}
+                onBlur={(e) => {
+                  const v = e.target.value.trim();
                   if (v) onUpdateQuest(quest.id, { name: v });
                   setEditingName(false);
-                }
-              }}
-              className="text-lg font-semibold h-9 max-w-md"
-            />
-          ) : (
-            <h2
-              className="text-lg font-semibold cursor-pointer hover:text-primary transition-colors"
-              onClick={() => setEditingName(true)}
-            >
-              {quest.name}
-            </h2>
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const v = (e.target as HTMLInputElement).value.trim();
+                    if (v) onUpdateQuest(quest.id, { name: v });
+                    setEditingName(false);
+                  }
+                }}
+                className="text-lg font-semibold h-9 max-w-md"
+              />
+            ) : (
+              <h2
+                className="text-lg font-semibold cursor-pointer hover:text-primary transition-colors"
+                onClick={() => setEditingName(true)}
+              >
+                {quest.name}
+              </h2>
+            )}
+            <Badge className={STATUS_COLORS[quest.status || "to_do"]} variant="secondary">
+              {QUEST_STATUS_LABELS[quest.status || "to_do"]}
+            </Badge>
+            <Button variant="outline" size="sm" className="h-7 text-xs ml-auto" onClick={onEditQuestProperties}>
+              <Settings2 className="h-3 w-3 mr-1" /> Propriétés
+            </Button>
+          </div>
+          <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
+            <span>ID: {quest.id}</span>
+            {startingChar && <span>Start: {startingChar.name}</span>}
+            {quest.requirements.length > 0 && <span>{quest.requirements.length} requirement(s)</span>}
+          </div>
+          {quest.description && (
+            <p className="text-xs text-muted-foreground mt-1 max-w-lg">{quest.description}</p>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          <Label className="text-xs text-muted-foreground">ID:</Label>
-          {editingId ? (
-            <Input
-              autoFocus
-              defaultValue={quest.id}
-              onBlur={(e) => {
-                const v = e.target.value.trim();
-                if (v && v !== quest.id) onUpdateQuest(quest.id, { id: v } as any);
-                setEditingId(false);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const v = (e.target as HTMLInputElement).value.trim();
-                  if (v && v !== quest.id) onUpdateQuest(quest.id, { id: v } as any);
-                  setEditingId(false);
-                }
-              }}
-              className="h-6 text-xs max-w-xs"
-            />
-          ) : (
-            <span
-              className="text-xs text-muted-foreground cursor-pointer hover:text-primary transition-colors"
-              onClick={() => setEditingId(true)}
-            >
-              {quest.id}
-            </span>
-          )}
-        </div>
+
+        <ScrollArea className="flex-1">
+          <div className="p-4 space-y-3 max-w-2xl">
+            {quest.steps.map((step, idx) => (
+              <StepCard
+                key={step.id}
+                step={step}
+                index={idx}
+                characters={characters}
+                onUpdateStep={(updates) => onUpdateStep(quest.id, step.id, updates)}
+                onDeleteStep={() => onDeleteStep(quest.id, step.id)}
+                onAddDialogue={(dialogue) => onAddStepDialogue(quest.id, step.id, dialogue)}
+                onUpdateDialogue={(dId, updates) => onUpdateStepDialogue(quest.id, step.id, dId, updates)}
+                onDeleteDialogue={(dId) => onDeleteStepDialogue(quest.id, step.id, dId)}
+              />
+            ))}
+
+            <div className="flex gap-2">
+              {STEP_TYPES.map((type) => (
+                <Button key={type} variant="outline" size="sm" className="text-xs" onClick={() => handleAddStep(type)}>
+                  <Plus className="h-3 w-3 mr-1" /> {STEP_TYPE_LABELS[type]}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </ScrollArea>
       </div>
 
-      <ScrollArea className="flex-1">
-        <div className="p-4 space-y-3 max-w-2xl">
-          {quest.steps.map((step, idx) => (
-            <StepCard
-              key={step.id}
-              step={step}
-              index={idx}
-              characters={characters}
-              onUpdateStep={(updates) => onUpdateStep(quest.id, step.id, updates)}
-              onDeleteStep={() => onDeleteStep(quest.id, step.id)}
-              onAddDialogue={(dialogue) => onAddStepDialogue(quest.id, step.id, dialogue)}
-              onUpdateDialogue={(dId, updates) => onUpdateStepDialogue(quest.id, step.id, dId, updates)}
-              onDeleteDialogue={(dId) => onDeleteStepDialogue(quest.id, step.id, dId)}
-            />
-          ))}
+      {/* Right panel: Status, Roles, Notes */}
+      <aside className="w-72 border-l bg-muted/20 flex flex-col shrink-0">
+        <ScrollArea className="flex-1">
+          <div className="p-4 space-y-5">
+            {/* Status */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">Status</Label>
+              <Select
+                value={quest.status || "to_do"}
+                onValueChange={(v) => onUpdateQuest(quest.id, { status: v as QuestStatus })}
+              >
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {QUEST_STATUSES.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {QUEST_STATUS_LABELS[s]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="flex gap-2">
-            {STEP_TYPES.map((type) => (
-              <Button key={type} variant="outline" size="sm" className="text-xs" onClick={() => handleAddStep(type)}>
-                <Plus className="h-3 w-3 mr-1" /> {STEP_TYPE_LABELS[type]}
-              </Button>
-            ))}
+            {/* Roles */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">Referent</Label>
+              <Select
+                value={quest.referent || "none"}
+                onValueChange={(v) => onUpdateQuest(quest.id, { referent: v === "none" ? "" : v })}
+              >
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue placeholder="None" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">N/A</SelectItem>
+                  {users.map((u) => (
+                    <SelectItem key={u} value={u}>{u}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">Rédacteur</Label>
+              <Select
+                value={quest.writer || "none"}
+                onValueChange={(v) => onUpdateQuest(quest.id, { writer: v === "none" ? "" : v })}
+              >
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue placeholder="None" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">N/A</SelectItem>
+                  {users.map((u) => (
+                    <SelectItem key={u} value={u}>{u}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Notes */}
+            <div className="space-y-2">
+              <Label className="text-xs font-medium">Notes</Label>
+              <div className="space-y-2">
+                {(quest.notes || []).map((note) => (
+                  <Card key={note.id} className="p-2.5 space-y-1">
+                    <div className="flex items-start justify-between gap-1">
+                      <p className="text-xs whitespace-pre-wrap break-words flex-1">{note.content}</p>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 shrink-0 text-destructive"
+                        onClick={() => handleDeleteNote(note.id)}
+                      >
+                        <Trash2 className="h-2.5 w-2.5" />
+                      </Button>
+                    </div>
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                      <span className="font-medium">{note.creator}</span>
+                      <span>{new Date(note.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+              <div className="space-y-1.5">
+                <Textarea
+                  placeholder="Ajoutez une note pour cette quête…"
+                  value={noteText}
+                  onChange={(e) => setNoteText(e.target.value)}
+                  className="min-h-[60px] text-xs resize-y"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-xs"
+                  onClick={handleAddNote}
+                  disabled={!noteText.trim()}
+                >
+                  <Plus className="h-3 w-3 mr-1" />Rajouter la note
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
-      </ScrollArea>
+        </ScrollArea>
+      </aside>
     </div>
   );
 }
