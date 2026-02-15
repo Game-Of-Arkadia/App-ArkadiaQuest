@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { QuestSidebar } from "@/components/QuestSidebar";
+import type { AppSection } from "@/components/AppHeader";
 import { QuestEditor } from "@/components/QuestEditor";
 import { CharactersSheet } from "@/components/CharactersSheet";
 import { QuestFormModal } from "@/components/QuestFormModal";
 import { LoginScreen } from "@/components/LoginScreen";
+import { NpcDashboard } from "@/components/NpcDashboard";
 import { useCharacters } from "@/hooks/useCharacters";
 import { useQuests } from "@/hooks/useQuests";
 import { useUser } from "@/hooks/useUser";
@@ -12,6 +14,7 @@ import type { Quest } from "@/types/quest";
 
 const Index = () => {
   const { currentUser, users, login, logout } = useUser();
+  const [activeSection, setActiveSection] = useState<AppSection>("quests");
   const [charactersOpen, setCharactersOpen] = useState(false);
   const [questModalOpen, setQuestModalOpen] = useState(false);
   const [questModalGroupId, setQuestModalGroupId] = useState("");
@@ -81,51 +84,64 @@ const Index = () => {
   return (
     <div className="flex flex-col h-screen bg-background">
       <AppHeader
-        onOpenCharacters={() => setCharactersOpen(true)}
         currentUser={currentUser}
+        activeSection={activeSection}
+        onChangeSection={setActiveSection}
         onLogout={logout}
       />
 
-      <div className="flex flex-1 min-h-0">
-        <QuestSidebar
-          groups={groups}
-          quests={quests}
-          selectedQuestId={selectedQuestId}
-          onSelectQuest={setSelectedQuestId}
-          onAddGroup={(name) => addGroup({ id: crypto.randomUUID(), name })}
-          onRenameGroup={renameGroup}
-          onDeleteGroup={deleteGroup}
-          onCreateQuest={handleOpenCreateQuest}
-          onEditQuest={handleOpenEditQuest}
-          onRenameQuest={renameQuest}
-          onDeleteQuest={deleteQuest}
-        />
+      {activeSection === "quests" && (
+        <div className="flex flex-1 min-h-0">
+          <QuestSidebar
+            groups={groups}
+            quests={quests}
+            selectedQuestId={selectedQuestId}
+            onSelectQuest={setSelectedQuestId}
+            onAddGroup={(name) => addGroup({ id: crypto.randomUUID(), name })}
+            onRenameGroup={renameGroup}
+            onDeleteGroup={deleteGroup}
+            onCreateQuest={handleOpenCreateQuest}
+            onEditQuest={handleOpenEditQuest}
+            onRenameQuest={renameQuest}
+            onDeleteQuest={deleteQuest}
+          />
 
         <QuestEditor
-          quest={selectedQuest}
-          characters={characters}
-          quests={quests}
-          users={users}
-          currentUser={currentUser}
-          onUpdateQuest={(id, updates) => {
-            if (updates.id && updates.id !== id) {
-              updateQuest(id, updates);
-              setSelectedQuestId(updates.id);
-            } else {
-              updateQuest(id, updates);
-            }
-          }}
-          onEditQuestProperties={() => {
-            if (selectedQuest) handleOpenEditQuest(selectedQuest);
-          }}
-          onAddStep={addStep}
-          onUpdateStep={updateStep}
-          onDeleteStep={deleteStep}
-          onAddStepDialogue={addStepDialogue}
-          onUpdateStepDialogue={updateStepDialogue}
-          onDeleteStepDialogue={deleteStepDialogue}
-        />
-      </div>
+            quest={selectedQuest}
+            characters={characters}
+            quests={quests}
+            users={users}
+            currentUser={currentUser}
+            onUpdateQuest={(id, updates) => {
+              if (updates.id && updates.id !== id) {
+                updateQuest(id, updates);
+                setSelectedQuestId(updates.id);
+              } else {
+                updateQuest(id, updates);
+              }
+            }}
+            onEditQuestProperties={() => {
+              if (selectedQuest) handleOpenEditQuest(selectedQuest);
+            }}
+            onAddStep={addStep}
+            onUpdateStep={updateStep}
+            onDeleteStep={deleteStep}
+            onAddStepDialogue={addStepDialogue}
+            onUpdateStepDialogue={updateStepDialogue}
+            onDeleteStepDialogue={deleteStepDialogue}
+          />
+        </div>
+      )}
+      {activeSection === "npcs" && (
+        <div className="flex flex-1 min-h-0">
+          <NpcDashboard
+            characters={characters}
+            onAdd={addCharacter}
+            onUpdate={updateCharacter}
+            onDelete={deleteCharacter}
+          />
+        </div>
+      )}
 
       <CharactersSheet
         open={charactersOpen}

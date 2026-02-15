@@ -10,7 +10,7 @@ export interface Character {
   x: number;
   y: number;
   z: number;
-  otherInfo: string;
+  otherInfo: string[];
   yamlConfig: string;
 }
 

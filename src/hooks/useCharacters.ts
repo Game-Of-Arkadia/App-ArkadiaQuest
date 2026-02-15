@@ -17,7 +17,7 @@ function seedCharacters(): Character[] {
       imagePath: "",
       gender: "male",
       x: 0, y: 0, z: 0,
-      otherInfo: "",
+      otherInfo: [],
       yamlConfig: DEFAULT_YAML_CONFIG,
     },
     {
@@ -28,7 +28,7 @@ function seedCharacters(): Character[] {
       imagePath: "",
       gender: "male",
       x: 0, y: 0, z: 0,
-      otherInfo: "",
+      otherInfo: [],
       yamlConfig: AMBIANT_YAML_CONFIG,
     },
   ];
@@ -46,7 +46,7 @@ function loadCharacters(): Character[] {
       x: c.x ?? 0,
       y: c.y ?? 0,
       z: c.z ?? 0,
-      otherInfo: c.otherInfo ?? "",
+      otherInfo: Array.isArray(c.otherInfo) ? c.otherInfo : (c.otherInfo ? [c.otherInfo] : []),
       yamlConfig: c.yamlConfig ?? "",
     }));
     // Ensure seed characters exist

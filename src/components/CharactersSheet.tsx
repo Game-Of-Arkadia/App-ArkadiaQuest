@@ -43,7 +43,7 @@ export function CharactersSheet({
       x: 0,
       y: 0,
       z: 0,
-      otherInfo: "",
+      otherInfo: [],
       yamlConfig: "",
     };
     onAdd(newChar);
@@ -169,12 +169,42 @@ export function CharactersSheet({
                     )}
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs">Informations supplémentaires</Label>
-                    <Input
-                      value={selected.otherInfo}
-                      onChange={(e) => onUpdate(selected.id, { otherInfo: e.target.value })}
-                      className="h-8 text-sm"
-                    />
+                    <Label className="text-xs">Other Information</Label>
+                    <div className="space-y-1">
+                      {(selected.otherInfo || []).map((info, idx) => (
+                        <div key={idx} className="flex gap-1">
+                          <Input
+                            value={info}
+                            onChange={(e) => {
+                              const updated = [...selected.otherInfo];
+                              updated[idx] = e.target.value;
+                              onUpdate(selected.id, { otherInfo: updated });
+                            }}
+                            className="h-7 text-xs flex-1"
+                            placeholder="Info entry…"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 shrink-0 text-destructive"
+                            onClick={() => {
+                              const updated = selected.otherInfo.filter((_, i) => i !== idx);
+                              onUpdate(selected.id, { otherInfo: updated });
+                            }}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs h-7"
+                        onClick={() => onUpdate(selected.id, { otherInfo: [...(selected.otherInfo || []), ""] })}
+                      >
+                        <Plus className="h-3 w-3 mr-1" /> Add Info
+                      </Button>
+                    </div>
                   </div>
 
                   <Separator />
@@ -221,14 +251,14 @@ export function CharactersSheet({
                         setSelectedId(null);
                       }}
                     >
-                      <Trash2 className="h-3 w-3 mr-1" /> Delete Character
+                      <Trash2 className="h-3 w-3 mr-1" /> Delete PNJ
                     </Button>
                   )}
                 </div>
               </ScrollArea>
             ) : (
               <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
-                Select or create a character
+                Sélectionnez un PNJ à éditer ou créez-en un nouveau.
               </div>
             )}
           </div>
