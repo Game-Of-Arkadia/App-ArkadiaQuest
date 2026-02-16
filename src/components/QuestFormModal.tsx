@@ -13,15 +13,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Character, Quest, QuestRequirement, RequirementType } from "@/types/quest";
+import type { Character, Quest, QuestGroup, QuestRequirement, RequirementType } from "@/types/quest";
 import { REQUIREMENT_TYPE_LABELS, defaultRequirementData } from "@/types/quest";
 
 interface QuestFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  quest?: Quest | null; // null/undefined = create mode
-  quests: Quest[]; // for requirement quest picker
+  quest?: Quest | null;
+  quests: Quest[];
   characters: Character[];
+  groups: QuestGroup[];
   groupId: string;
   onSubmit: (data: {
     id: string;
@@ -29,6 +30,7 @@ interface QuestFormModalProps {
     description: string;
     startingCharacterId: string;
     requirements: QuestRequirement[];
+    groupId: string;
   }) => void;
 }
 
@@ -40,6 +42,7 @@ export function QuestFormModal({
   quest,
   quests,
   characters,
+  groups,
   groupId,
   onSubmit,
 }: QuestFormModalProps) {
@@ -50,6 +53,7 @@ export function QuestFormModal({
   const [description, setDescription] = useState("");
   const [startingCharacterId, setStartingCharacterId] = useState("");
   const [requirements, setRequirements] = useState<QuestRequirement[]>([]);
+  const [selectedGroupId, setSelectedGroupId] = useState(groupId);
 
   useEffect(() => {
     if (open) {
@@ -67,16 +71,17 @@ export function QuestFormModal({
         setRequirements([]);
       }
     }
-  }, [open, quest]);
+ }, [open, quest, groupId, groups]);
 
   const handleSubmit = () => {
-    if (!name.trim() || !questId.trim()) return;
+    if (!name.trim() || !questId.trim() || !selectedGroupId) return;
     onSubmit({
       id: questId.trim(),
       name: name.trim(),
       description: description.trim(),
       startingCharacterId,
       requirements,
+      groupId: selectedGroupId,
     });
     onOpenChange(false);
   };
@@ -95,7 +100,6 @@ export function QuestFormModal({
     setRequirements((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Other quests available for "finish quest" requirement
   const otherQuests = quests.filter((q) => q.id !== questId);
 
   return (
@@ -111,7 +115,6 @@ export function QuestFormModal({
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          {/* Name & ID */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-xs">
@@ -138,7 +141,29 @@ export function QuestFormModal({
             </div>
           </div>
 
-          {/* Description */}
+          <div className="space-y-1.5">
+            <Label className="text-xs">
+              Group <span className="text-destructive">*</span>
+            </Label>
+            <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
+              <SelectTrigger className="h-8 text-sm">
+                <SelectValue placeholder="Select a group…" />
+              </SelectTrigger>
+              <SelectContent>
+                {groups.map((g) => (
+                  <SelectItem key={g.id} value={g.id}>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                        style={{ backgroundColor: g.color }}
+                      />
+                      {g.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Description</Label>
             <Textarea
@@ -149,7 +174,6 @@ export function QuestFormModal({
             />
           </div>
 
-          {/* Starting Character */}
           <div className="space-y-1.5">
             <Label className="text-xs">NPC de départ</Label>
             <Select value={startingCharacterId || "none"} onValueChange={(v) => setStartingCharacterId(v === "none" ? "" : v)}>
@@ -167,7 +191,6 @@ export function QuestFormModal({
             </Select>
           </div>
 
-          {/* Requirements */}
           <div className="space-y-2">
             <Label className="text-xs">Prérequis</Label>
             {requirements.map((req, idx) => (
@@ -223,7 +246,7 @@ export function QuestFormModal({
           <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
             Annuler
           </Button>
-          <Button size="sm" onClick={handleSubmit} disabled={!name.trim() || !questId.trim()}>
+          <Button size="sm" onClick={handleSubmit} disabled={!name.trim() || !questId.trim() || !selectedGroupId}>
             {isEditing ? "Sauvegarder les modifications" : "Créer la quête"}
           </Button>
         </DialogFooter>
