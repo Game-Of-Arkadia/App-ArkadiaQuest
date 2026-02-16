@@ -106,12 +106,7 @@ export function QuestFormModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{isEditing ? "Edit Quest" : "Create Quest"}</DialogTitle>
-          <DialogDescription>
-            {isEditing
-              ? "Update quest properties below."
-              : "Fill in the quest details to create a new quest."}
-          </DialogDescription>
+          <DialogTitle>{isEditing ? "Modifier la quête" : "Créer une quête"}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
@@ -241,15 +236,9 @@ export function QuestFormModal({
             </div>
           </div>
         </div>
-
-        <DialogFooter>
-          <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
-            Annuler
-          </Button>
-          <Button size="sm" onClick={handleSubmit} disabled={!name.trim() || !questId.trim() || !selectedGroupId}>
-            {isEditing ? "Sauvegarder les modifications" : "Créer la quête"}
-          </Button>
-        </DialogFooter>
+        <Button size="sm" onClick={handleSubmit} disabled={!name.trim() || !questId.trim() || !selectedGroupId}>
+          {isEditing ? "Sauvegarder les modifications" : "Créer la quête"}
+        </Button>
       </DialogContent>
     </Dialog>
   );
