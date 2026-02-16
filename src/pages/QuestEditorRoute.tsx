@@ -45,15 +45,11 @@ export default function QuestEditorRoute() {
         onChangeSection={(section) => {
           if (section === "quests") navigate("/");
           else navigate("/");
-          // Navigate back to dashboard for any section change
         }}
         onLogout={logout}
+        backButtonLabel="Back to Dashboard"
+        onBack={() => navigate("/")}
       />
-      <div className="px-4 py-2 border-b shrink-0">
-        <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => navigate("/")}>
-          <ArrowLeft className="h-3 w-3" /> Back to Dashboard
-        </Button>
-      </div>
       <div className="flex flex-1 min-h-0">
         <QuestEditor
           quest={quest}

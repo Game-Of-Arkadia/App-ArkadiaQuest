@@ -54,10 +54,9 @@ export function QuestDashboard({ groups, quests, onCreateQuest, onDeleteQuest, o
                         style={{ backgroundColor: group.color }}
                       />
                       <span className="text-sm font-semibold">{group.name}</span>
-                      <span className="text-xs text-muted-foreground">({groupQuests.length})</span>
                     </div>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
                       className="text-xs h-7"
                       onClick={() => onCreateQuest(group.id)}
@@ -102,7 +101,7 @@ export function QuestDashboard({ groups, quests, onCreateQuest, onDeleteQuest, o
                             <TableCell className="text-xs">{q.referent || "—"}</TableCell>
                             <TableCell className="text-xs">{q.writer || "—"}</TableCell>
                             <TableCell className="text-xs text-muted-foreground">{q.steps.length}</TableCell>
-                            <TableCell className="text-xs text-muted-foreground">{(q.notes || []).length}</TableCell>
+                            <TableCell className="text-xs">{q.notes?.map((note) => note.content).join(";\t") || "—"}</TableCell>
                           </TableRow>
                         ))
                       )}
