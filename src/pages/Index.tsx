@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
-import { QuestSidebar } from "@/components/QuestSidebar";
+import { QuestDashboard } from "@/components/QuestDashboard";
 import type { AppSection } from "@/components/AppHeader";
-import { QuestEditor } from "@/components/QuestEditor";
 import { CharactersSheet } from "@/components/CharactersSheet";
 import { QuestFormModal } from "@/components/QuestFormModal";
 import { LoginScreen } from "@/components/LoginScreen";
+import { GroupFormModal } from "@/components/GroupFormModal";
 import { NpcDashboard } from "@/components/NpcDashboard";
 import { useCharacters } from "@/hooks/useCharacters";
 import { useQuests } from "@/hooks/useQuests";
@@ -18,39 +18,22 @@ const Index = () => {
   const [charactersOpen, setCharactersOpen] = useState(false);
   const [questModalOpen, setQuestModalOpen] = useState(false);
   const [questModalGroupId, setQuestModalGroupId] = useState("");
-  const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
+  const [groupModalOpen, setGroupModalOpen] = useState(false);
 
   const { characters, addCharacter, updateCharacter, deleteCharacter } = useCharacters();
   const {
     groups,
     quests,
-    selectedQuest,
-    selectedQuestId,
-    setSelectedQuestId,
     addGroup,
     renameGroup,
     deleteGroup,
     addQuest,
     updateQuest,
-    renameQuest,
     deleteQuest,
-    addStep,
-    updateStep,
-    deleteStep,
-    addStepDialogue,
-    updateStepDialogue,
-    deleteStepDialogue,
   } = useQuests();
 
   const handleOpenCreateQuest = (groupId: string) => {
-    setEditingQuest(null);
     setQuestModalGroupId(groupId);
-    setQuestModalOpen(true);
-  };
-
-  const handleOpenEditQuest = (quest: Quest) => {
-    setEditingQuest(quest);
-    setQuestModalGroupId(quest.groupId);
     setQuestModalOpen(true);
   };
 
@@ -60,21 +43,16 @@ const Index = () => {
     description: string;
     startingCharacterId: string;
     requirements: Quest["requirements"];
+    groupId: string;
   }) => {
-    if (editingQuest) {
-      updateQuest(editingQuest.id, data);
-    } else {
-      addQuest({
-        ...data,
-        groupId: questModalGroupId,
-        steps: [],
-        status: "to_do",
-        referent: "",
-        writer: "",
-        notes: [],
-      });
-      setSelectedQuestId(data.id);
-    }
+    addQuest({
+      ...data,
+      steps: [],
+      status: "to_do",
+      referent: "",
+      writer: "",
+      notes: [],
+    });
   };
 
   if (!currentUser) {
@@ -91,46 +69,13 @@ const Index = () => {
       />
 
       {activeSection === "quests" && (
-        <div className="flex flex-1 min-h-0">
-          <QuestSidebar
-            groups={groups}
-            quests={quests}
-            selectedQuestId={selectedQuestId}
-            onSelectQuest={setSelectedQuestId}
-            onAddGroup={(name) => addGroup({ id: crypto.randomUUID(), name })}
-            onRenameGroup={renameGroup}
-            onDeleteGroup={deleteGroup}
-            onCreateQuest={handleOpenCreateQuest}
-            onEditQuest={handleOpenEditQuest}
-            onRenameQuest={renameQuest}
-            onDeleteQuest={deleteQuest}
-          />
-
-        <QuestEditor
-            quest={selectedQuest}
-            characters={characters}
-            quests={quests}
-            users={users}
-            currentUser={currentUser}
-            onUpdateQuest={(id, updates) => {
-              if (updates.id && updates.id !== id) {
-                updateQuest(id, updates);
-                setSelectedQuestId(updates.id);
-              } else {
-                updateQuest(id, updates);
-              }
-            }}
-            onEditQuestProperties={() => {
-              if (selectedQuest) handleOpenEditQuest(selectedQuest);
-            }}
-            onAddStep={addStep}
-            onUpdateStep={updateStep}
-            onDeleteStep={deleteStep}
-            onAddStepDialogue={addStepDialogue}
-            onUpdateStepDialogue={updateStepDialogue}
-            onDeleteStepDialogue={deleteStepDialogue}
-          />
-        </div>
+        <QuestDashboard
+          groups={groups}
+          quests={quests}
+          onCreateQuest={handleOpenCreateQuest}
+          onDeleteQuest={deleteQuest}
+          onOpenGroupModal={() => setGroupModalOpen(true)}
+        />
       )}
       {activeSection === "npcs" && (
         <div className="flex flex-1 min-h-0">
@@ -155,11 +100,17 @@ const Index = () => {
       <QuestFormModal
         open={questModalOpen}
         onOpenChange={setQuestModalOpen}
-        quest={editingQuest}
         quests={quests}
         characters={characters}
+        groups={groups}
         groupId={questModalGroupId}
         onSubmit={handleQuestFormSubmit}
+      />
+
+      <GroupFormModal
+        open={groupModalOpen}
+        onOpenChange={setGroupModalOpen}
+        onSubmit={({ name, color }) => addGroup({ id: crypto.randomUUID(), name, color })}
       />
     </div>
   );

@@ -120,9 +120,21 @@ export interface Quest {
   dialogues?: Dialogue[];
 }
 
+export const GROUP_COLORS = [
+  { name: "Gray", value: "hsl(0 0% 50%)" },
+  { name: "Red", value: "hsl(0 72% 51%)" },
+  { name: "Brown", value: "hsl(25, 78%, 31%)" },
+  { name: "Yellow", value: "hsl(48 96% 53%)" },
+  { name: "Green", value: "hsl(142 71% 45%)" },
+  { name: "Blue", value: "hsl(217 91% 60%)" },
+  { name: "Purple", value: "hsl(263 70% 50%)" },
+  { name: "Pink", value: "hsl(330 81% 60%)" },
+] as const;
+
 export interface QuestGroup {
   id: string;
   name: string;
+  color: string;
 }
 
 // Helper to get default data for a step type
