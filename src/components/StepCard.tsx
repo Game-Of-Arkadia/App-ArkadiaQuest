@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { CoordinatesInput } from "@/components/CoordinatesInput";
 import { DialogueCard } from "@/components/DialogueCard";
 import type { Character, QuestStep, GoSomewhereData, TalkToCharacterData, Dialogue, StepData } from "@/types/quest";
 import { STEP_TYPE_LABELS } from "@/types/quest";
@@ -22,22 +23,25 @@ interface StepCardProps {
 }
 
 function GoSomewhereEditor({ data, onChange }: { data: GoSomewhereData; onChange: (d: GoSomewhereData) => void }) {
-  const update = (field: keyof GoSomewhereData, value: string) => {
-    onChange({ ...data, [field]: parseFloat(value) || 0 });
-  };
   return (
-    <div className="grid grid-cols-4 gap-2">
-      {(["x", "y", "z", "radius"] as const).map((f) => (
-        <div key={f} className="space-y-1">
-          <Label className="text-[10px] uppercase text-muted-foreground">{f}</Label>
-          <Input
-            type="number"
-            value={data[f]}
-            onChange={(e) => update(f, e.target.value)}
-            className="h-7 text-xs"
-          />
-        </div>
-      ))}
+    <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-1">
+        <Label className="text-[10px] uppercase text-muted-foreground">Coordinates</Label>
+        <CoordinatesInput
+          x={data.x} y={data.y} z={data.z}
+          onChange={(coords) => onChange({ ...data, ...coords })}
+          inputClassName="h-7 text-xs font-mono"
+        />
+      </div>
+      <div className="space-y-1">
+        <Label className="text-[10px] uppercase text-muted-foreground">Radius</Label>
+        <Input
+          type="number"
+          value={data.radius}
+          onChange={(e) => onChange({ ...data, radius: parseFloat(e.target.value) || 0 })}
+          className="h-7 text-xs"
+        />
+      </div>
     </div>
   );
 }

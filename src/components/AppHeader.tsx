@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 export type AppSection = "quests" | "npcs";
 export const APP_SECTIONS: { id: AppSection; label: string }[] = [
-  { id: "quests", label: "Editeur de Quêtes" },
+  { id: "quests", label: "Dashboard Quêtes" },
   { id: "npcs", label: "PNJ d'Arkadia" },
 ];
 

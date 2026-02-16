@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { CoordinatesInput } from "@/components/CoordinatesInput";
 import type { Character, CharacterGender } from "@/types/quest";
 
 interface NpcDashboardProps {
@@ -49,14 +50,12 @@ export function NpcDashboard({ characters, onAdd, onUpdate, onDelete }: NpcDashb
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-xs">ID du PNJ</TableHead>
-              <TableHead className="text-xs">Nom</TableHead>
-              <TableHead className="text-xs">Code du PNJ</TableHead>
-              <TableHead className="text-xs">Genre</TableHead>
-              <TableHead className="text-xs">X</TableHead>
-              <TableHead className="text-xs">Y</TableHead>
-              <TableHead className="text-xs">Z</TableHead>
-              <TableHead className="text-xs">Info Supplémentaire</TableHead>
+              <TableHead className="text-xs w-16">Character ID</TableHead>
+              <TableHead className="text-xs w-60">Nom</TableHead>
+              <TableHead className="text-xs w-64">Code du PNJ</TableHead>
+              <TableHead className="text-xs w-28">Gender</TableHead>
+              <TableHead className="text-xs w-40">Coordinates</TableHead>
+              <TableHead className="text-xs">Information Supplémentaire</TableHead>
               <TableHead className="text-xs w-20" />
             </TableRow>
           </TableHeader>
@@ -74,7 +73,7 @@ export function NpcDashboard({ characters, onAdd, onUpdate, onDelete }: NpcDashb
                     <Input
                       value={c.characterId}
                       onChange={(e) => onUpdate(c.id, { characterId: e.target.value })}
-                      className="h-7 text-xs font-mono"
+                      className="h-7 text-xs font-mono w-16"
                     />
                   </TableCell>
                   <TableCell className="p-1">
@@ -96,7 +95,7 @@ export function NpcDashboard({ characters, onAdd, onUpdate, onDelete }: NpcDashb
                       value={c.gender}
                       onValueChange={(v) => onUpdate(c.id, { gender: v as CharacterGender })}
                     >
-                      <SelectTrigger className="h-7 text-xs w-20">
+                      <SelectTrigger className="h-7 text-xs w-28">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -105,19 +104,16 @@ export function NpcDashboard({ characters, onAdd, onUpdate, onDelete }: NpcDashb
                       </SelectContent>
                     </Select>
                   </TableCell>
-                  {(["x", "y", "z"] as const).map((axis) => (
-                    <TableCell key={axis} className="p-1">
-                      <Input
-                        type="number"
-                        value={c[axis]}
-                        onChange={(e) => onUpdate(c.id, { [axis]: parseFloat(e.target.value) || 0 })}
-                        className="h-7 text-xs w-16 font-mono"
-                      />
-                    </TableCell>
-                  ))}
                   <TableCell className="p-1">
-                    <div className="text-xs text-muted-foreground truncate max-w-[120px]">
-                      {c.otherInfo.length > 0 ? c.otherInfo.join(", ") : "—"}
+                    <CoordinatesInput
+                      x={c.x} y={c.y} z={c.z}
+                      onChange={(coords) => onUpdate(c.id, coords)}
+                      inputClassName="h-7 text-xs w-40 font-mono"
+                    />
+                  </TableCell>
+                  <TableCell className="p-1">
+                    <div className="text-xs text-muted-foreground">
+                      {c.otherInfo.length > 0 ? c.otherInfo.join("; ") : "—"}
                     </div>
                   </TableCell>
                   <TableCell className="p-1">
@@ -191,7 +187,7 @@ export function NpcDashboard({ characters, onAdd, onUpdate, onDelete }: NpcDashb
                       value={editingChar.gender}
                       onValueChange={(v) => onUpdate(editingChar.id, { gender: v as CharacterGender })}
                     >
-                      <SelectTrigger className="h-8 text-sm">
+                      <SelectTrigger className="h-8 text-sm w-full">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -212,19 +208,11 @@ export function NpcDashboard({ characters, onAdd, onUpdate, onDelete }: NpcDashb
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs">Coordonnées</Label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(["x", "y", "z"] as const).map((axis) => (
-                      <div key={axis} className="space-y-1">
-                        <Label className="text-[10px] uppercase text-muted-foreground">{axis}</Label>
-                        <Input
-                          type="number"
-                          value={editingChar[axis]}
-                          onChange={(e) => onUpdate(editingChar.id, { [axis]: parseFloat(e.target.value) || 0 })}
-                          className="h-7 text-xs"
-                        />
-                      </div>
-                    ))}
-                  </div>
+                  <CoordinatesInput
+                    x={editingChar.x} y={editingChar.y} z={editingChar.z}
+                    onChange={(coords) => onUpdate(editingChar.id, coords)}
+                    inputClassName="h-8 text-sm font-mono"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs">Information Supplémentaire</Label>
@@ -239,7 +227,7 @@ export function NpcDashboard({ characters, onAdd, onUpdate, onDelete }: NpcDashb
                             onUpdate(editingChar.id, { otherInfo: updated });
                           }}
                           className="h-7 text-xs flex-1"
-                          placeholder="Info entry…"
+                          placeholder="Info…"
                         />
                         <Button
                           variant="ghost"
@@ -261,7 +249,7 @@ export function NpcDashboard({ characters, onAdd, onUpdate, onDelete }: NpcDashb
                       className="text-xs h-7"
                       onClick={() => onUpdate(editingChar.id, { otherInfo: [...(editingChar.otherInfo || []), ""] })}
                     >
-                      <Plus className="h-3 w-3 mr-1" /> Add Info
+                      <Plus className="h-3 w-3 mr-1" /> Ajouter une info
                     </Button>
                   </div>
                 </div>
