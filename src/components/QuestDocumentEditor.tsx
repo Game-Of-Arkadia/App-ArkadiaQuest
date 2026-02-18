@@ -170,3 +170,60 @@ function TalkToCharacterBlock({
     </div>
   );
 }
+/* Note: both "talk_to_character" steps use the same data shape.
+   If the step has a single dialogue, I present it as "[Character] says:" style.
+   For multiple dialogues I use the "Talk to [Character]" style.
+   This is handled automatically: steps with 0-1 dialogues initially look like "says:" style
+   but the user can always add more lines. */
+function GoSomewhereBlock({
+  step,
+  questId,
+  onUpdateStep,
+  onDeleteStep,
+}: {
+  step: QuestStep;
+  questId: string;
+  onUpdateStep: (questId: string, stepId: string, updates: Partial<QuestStep>) => void;
+  onDeleteStep: (questId: string, stepId: string) => void;
+}) {
+  const data = step.data as GoSomewhereData;
+  return (
+    <div className="group/event relative border-l-2 border-accent-foreground/30 rounded-r-md bg-accent/[0.06] py-2 px-3 my-1">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-1 right-1 h-5 w-5 opacity-0 group-hover/event:opacity-100 transition-opacity text-destructive/60 hover:text-destructive"
+        onClick={() => onDeleteStep(questId, step.id)}
+      >
+        <Trash2 className="h-3 w-3" />
+      </Button>
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-accent-foreground font-medium text-sm select-none flex items-center gap-1">
+          <MapPin className="h-3.5 w-3.5" /> → Se rendre à
+        </span>
+        <CoordinatesInput
+          x={data.x}
+          y={data.y}
+          z={data.z}
+          onChange={(coords) =>
+            onUpdateStep(questId, step.id, { data: { ...data, ...coords } })
+          }
+          inputClassName="h-6 text-xs font-mono w-32 bg-background/60 border-dashed"
+        />
+        <div className="flex items-center gap-1">
+          <span className="text-[10px] text-muted-foreground select-none">radius:</span>
+          <Input
+            type="number"
+            value={data.radius}
+            onChange={(e) =>
+              onUpdateStep(questId, step.id, {
+                data: { ...data, radius: parseFloat(e.target.value) || 0 },
+              })
+            }
+            className="h-6 text-xs w-16 font-mono bg-background/60 border-dashed"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
