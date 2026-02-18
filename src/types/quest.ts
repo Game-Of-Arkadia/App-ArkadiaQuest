@@ -141,7 +141,7 @@ export interface QuestGroup {
 export function defaultStepData(type: StepType): StepData {
   switch (type) {
     case "go_somewhere":
-      return { x: 0, y: 0, z: 0, radius: 1 };
+      return { x: 0, y: 0, z: 0, radius: 5 };
     case "talk_to_character":
       return { characterId: "" };
   }
