@@ -80,3 +80,93 @@ function DialogueLine({
     </div>
   );
 }
+function TalkToCharacterBlock({
+  step,
+  questId,
+  characters,
+  onUpdateStep,
+  onDeleteStep,
+  onAddDialogue,
+  onUpdateDialogue,
+  onDeleteDialogue,
+}: {
+  step: QuestStep;
+  questId: string;
+  characters: Character[];
+  onUpdateStep: (questId: string, stepId: string, updates: Partial<QuestStep>) => void;
+  onDeleteStep: (questId: string, stepId: string) => void;
+  onAddDialogue: (questId: string, stepId: string, dialogue: Dialogue) => void;
+  onUpdateDialogue: (questId: string, stepId: string, dialogueId: string, updates: Partial<Dialogue>) => void;
+  onDeleteDialogue: (questId: string, stepId: string, dialogueId: string) => void;
+}) {
+  const data = step.data as TalkToCharacterData;
+  const selectedChar = characters.find((c) => c.id === data.characterId);
+  const handleAddLine = () => {
+    onAddDialogue(questId, step.id, {
+      id: crypto.randomUUID(),
+      characterId: data.characterId || "",
+      text: "",
+    });
+  };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, dialogueIndex: number) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddLine();
+    }
+    if (e.key === "Backspace" && (e.target as HTMLInputElement).value === "" && step.dialogues.length > 0) {
+      e.preventDefault();
+      const d = step.dialogues[dialogueIndex];
+      if (d) onDeleteDialogue(questId, step.id, d.id);
+    }
+  };
+  return (
+    <div className="group/event relative border-l-2 border-primary/30 rounded-r-md bg-primary/[0.03] py-2 px-3 my-1">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-1 right-1 h-5 w-5 opacity-0 group-hover/event:opacity-100 transition-opacity text-destructive/60 hover:text-destructive"
+        onClick={() => onDeleteStep(questId, step.id)}
+      >
+        <Trash2 className="h-3 w-3" />
+      </Button>
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <span className="text-primary font-medium text-sm select-none">→ Parler à </span>
+        <Select
+          value={data.characterId || ""}
+          onValueChange={(v) =>
+            onUpdateStep(questId, step.id, { data: { ...data, characterId: v } })
+          }
+        >
+          <SelectTrigger className="h-6 text-xs w-36 border-dashed bg-background/60">
+            <SelectValue/>
+          </SelectTrigger>
+          <SelectContent>
+            {characters.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.name} ({c.npcCode})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="mt-1">
+        {step.dialogues.map((d, i) => (
+          <div key={d.id} onKeyDown={(e) => handleKeyDown(e as any, i)}>
+            <DialogueLine
+              dialogue={d}
+              characters={characters}
+              onUpdate={(updates) => onUpdateDialogue(questId, step.id, d.id, updates)}
+              onDelete={() => onDeleteDialogue(questId, step.id, d.id)}
+            />
+          </div>
+        ))}
+      </div>
+      <button
+        className="flex items-center gap-1 pl-6 py-0.5 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+        onClick={handleAddLine}
+      >
+        <Plus className="h-2.5 w-2.5" /> Nouvelle phrase
+      </button>
+    </div>
+  );
+}

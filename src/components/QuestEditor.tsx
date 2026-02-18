@@ -8,9 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { StepCard } from "@/components/StepCard";
+import { QuestDocumentEditor } from "@/components/QuestDocumentEditor";
 import type { Character, Quest, QuestStep, Dialogue, StepType, QuestNote, QuestStatus } from "@/types/quest";
-import { defaultStepData, STEP_TYPE_LABELS, QUEST_STATUS_LABELS, QUEST_STATUSES } from "@/types/quest";
+import { QUEST_STATUS_LABELS, QUEST_STATUSES } from "@/types/quest";
 
 interface QuestEditorProps {
   quest: Quest | null;
@@ -28,7 +28,6 @@ interface QuestEditorProps {
   onDeleteStepDialogue: (questId: string, stepId: string, dialogueId: string) => void;
 }
 
-const STEP_TYPES: StepType[] = ["go_somewhere", "talk_to_character"];
 
 const STATUS_COLORS: Record<QuestStatus, string> = {
   to_do: "bg-muted text-muted-foreground",
@@ -66,14 +65,6 @@ export function QuestEditor({
     );
   }
 
-  const handleAddStep = (type: StepType) => {
-    onAddStep(quest.id, {
-      id: crypto.randomUUID(),
-      type,
-      data: defaultStepData(type),
-      dialogues: [],
-    });
-  };
 
   const handleAddNote = () => {
     if (!noteText.trim()) return;
@@ -95,7 +86,6 @@ export function QuestEditor({
 
   return (
     <div className="flex-1 flex min-h-0">
-      {/* Main steps area */}
       <div className="flex-1 flex flex-col min-h-0">
         <div className="p-4 border-b shrink-0">
           <div className="flex items-center gap-3">
@@ -142,38 +132,21 @@ export function QuestEditor({
           )}
         </div>
 
-        <ScrollArea className="flex-1">
-          <div className="p-4 space-y-3 max-w-2xl">
-            {quest.steps.map((step, idx) => (
-              <StepCard
-                key={step.id}
-                step={step}
-                index={idx}
-                characters={characters}
-                onUpdateStep={(updates) => onUpdateStep(quest.id, step.id, updates)}
-                onDeleteStep={() => onDeleteStep(quest.id, step.id)}
-                onAddDialogue={(dialogue) => onAddStepDialogue(quest.id, step.id, dialogue)}
-                onUpdateDialogue={(dId, updates) => onUpdateStepDialogue(quest.id, step.id, dId, updates)}
-                onDeleteDialogue={(dId) => onDeleteStepDialogue(quest.id, step.id, dId)}
-              />
-            ))}
-
-            <div className="flex gap-2">
-              {STEP_TYPES.map((type) => (
-                <Button key={type} variant="outline" size="sm" className="text-xs" onClick={() => handleAddStep(type)}>
-                  <Plus className="h-3 w-3 mr-1" /> {STEP_TYPE_LABELS[type]}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </ScrollArea>
+        <QuestDocumentEditor
+          quest={quest}
+          characters={characters}
+          onAddStep={onAddStep}
+          onUpdateStep={onUpdateStep}
+          onDeleteStep={onDeleteStep}
+          onAddStepDialogue={onAddStepDialogue}
+          onUpdateStepDialogue={onUpdateStepDialogue}
+          onDeleteStepDialogue={onDeleteStepDialogue}
+        />
       </div>
 
-      {/* Right panel: Status, Roles, Notes */}
       <aside className="w-72 border-l bg-muted/20 flex flex-col shrink-0">
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-5">
-            {/* Status */}
             <div className="space-y-1.5">
               <Label className="text-xs font-medium">Status</Label>
               <Select
@@ -193,7 +166,6 @@ export function QuestEditor({
               </Select>
             </div>
 
-            {/* Roles */}
             <div className="space-y-1.5">
               <Label className="text-xs font-medium">Referent</Label>
               <Select
@@ -230,7 +202,6 @@ export function QuestEditor({
               </Select>
             </div>
 
-            {/* Notes */}
             <div className="space-y-2">
               <Label className="text-xs font-medium">Notes</Label>
               <div className="space-y-2">
