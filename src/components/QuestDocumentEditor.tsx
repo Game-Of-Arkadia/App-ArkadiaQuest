@@ -227,3 +227,95 @@ function GoSomewhereBlock({
     </div>
   );
 }
+export function QuestDocumentEditor({
+  quest,
+  characters,
+  onAddStep,
+  onUpdateStep,
+  onDeleteStep,
+  onAddStepDialogue,
+  onUpdateStepDialogue,
+  onDeleteStepDialogue,
+}: QuestDocumentEditorProps) {
+  const handleInsert = useCallback(
+    (type: StepType, afterIndex?: number) => {
+      const newStep: QuestStep = {
+        id: crypto.randomUUID(),
+        type,
+        data: defaultStepData(type),
+        dialogues:
+          type === "talk_to_character"
+            ? [{ id: crypto.randomUUID(), characterId: "", text: "" }]
+            : [],
+      };
+      onAddStep(quest.id, newStep);
+    },
+    [quest.id, onAddStep]
+  );
+  return (
+    <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-2xl mx-auto py-6 px-4">
+          {quest.steps.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground/60">
+              <p className="text-sm mb-3">Commencez à écrire votre quête.</p>
+              <div className="flex gap-2 justify-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs gap-1"
+                  onClick={() => handleInsert("talk_to_character")}
+                >
+                  <MessageCircle className="h-3 w-3" /> Parler à un PNJ
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs gap-1"
+                  onClick={() => handleInsert("go_somewhere")}
+                >
+                  <MapPin className="h-3 w-3" /> Se rendre à un endroit
+                </Button>
+              </div>
+            </div>
+          )}
+          {quest.steps.map((step, idx) => (
+            <div key={step.id} className="group/insert relative">
+              <div className="absolute -left-7 top-1/2 -translate-y-1/2 z-10">
+                <InsertEventMenu onInsert={(type) => handleInsert(type, idx)} />
+              </div>
+              {step.type === "talk_to_character" && (
+                <TalkToCharacterBlock
+                  step={step}
+                  questId={quest.id}
+                  characters={characters}
+                  onUpdateStep={onUpdateStep}
+                  onDeleteStep={onDeleteStep}
+                  onAddDialogue={onAddStepDialogue}
+                  onUpdateDialogue={onUpdateStepDialogue}
+                  onDeleteDialogue={onDeleteStepDialogue}
+                />
+              )}
+              {step.type === "go_somewhere" && (
+                <GoSomewhereBlock
+                  step={step}
+                  questId={quest.id}
+                  onUpdateStep={onUpdateStep}
+                  onDeleteStep={onDeleteStep}
+                />
+              )}
+            </div>
+          ))}
+          {quest.steps.length > 0 && (
+            <div className="group/insert relative py-2">
+              <div className="absolute -left-7 top-1/2 -translate-y-1/2 z-10">
+                <InsertEventMenu onInsert={(type) => handleInsert(type)} />
+              </div>
+              <div className="border-t border-dashed border-muted-foreground/20" />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
