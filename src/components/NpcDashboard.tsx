@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import { Badge } from "@/components/ui/badge";
 import { CoordinatesInput } from "@/components/CoordinatesInput";
 import { NpcHeadIcon } from "@/components/NpcHeadIcon";
+import { NpcFullBodyIcon } from "@/components/NpcFullBodyIcon";
 import type { Character, CharacterGender, Quest } from "@/types/quest";
 
 interface NpcDashboardProps {
