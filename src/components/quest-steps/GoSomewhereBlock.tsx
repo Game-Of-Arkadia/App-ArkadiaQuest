@@ -21,14 +21,14 @@ export function GoSomewhereBlock({
         <CoordinatesInput
           x={data.x} y={data.y} z={data.z}
           onChange={(coords) => onUpdateStep(questId, step.id, { data: { ...data, ...coords } })}
-          inputClassName="h-6 text-xs font-mono w-32 bg-background/60 border-dashed"
+          inputClassName="h-6 text-xs font-mono w-33 bg-background/60 border-dashed text-center"
         />
         <div className="flex items-center gap-1">
           <span className="text-[10px] text-muted-foreground select-none">r:</span>
           <Input
             type="number" value={data.radius}
             onChange={(e) => onUpdateStep(questId, step.id, { data: { ...data, radius: parseFloat(e.target.value) || 0 } })}
-            className="h-6 text-xs w-16 font-mono bg-background/60 border-dashed"
+            className="h-6 text-xs w-12 font-mono bg-background/60 border-dashed"
           />
         </div>
       </div>
