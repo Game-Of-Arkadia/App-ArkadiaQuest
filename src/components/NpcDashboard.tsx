@@ -56,10 +56,15 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
     setPreviewModalOpen(true);
   };
   const handleNew = () => {
+    let maxNum = 0;
+    for (const c of characters) {
+      const n = parseInt(c.characterId, 10);
+      if (!isNaN(n) && n > maxNum) maxNum = n;
+    }
     const newChar: Character = {
       id: crypto.randomUUID(),
       name: "PNJ",
-      characterId: "",
+      characterId: String(maxNum + 1),
       npcCode: "",
       imagePath: "",
       textureUrl: "",
