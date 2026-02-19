@@ -2,7 +2,6 @@ import { useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { QuestDashboard } from "@/components/QuestDashboard";
 import type { AppSection } from "@/components/AppHeader";
-import { CharactersSheet } from "@/components/CharactersSheet";
 import { QuestFormModal } from "@/components/QuestFormModal";
 import { LoginScreen } from "@/components/LoginScreen";
 import { GroupFormModal } from "@/components/GroupFormModal";
@@ -88,15 +87,6 @@ const Index = () => {
           />
         </div>
       )}
-
-      <CharactersSheet
-        open={charactersOpen}
-        onOpenChange={setCharactersOpen}
-        characters={characters}
-        onAdd={addCharacter}
-        onUpdate={updateCharacter}
-        onDelete={deleteCharacter}
-      />
 
       <QuestFormModal
         open={questModalOpen}

@@ -4,12 +4,14 @@ interface NpcFullBodyIconProps {
   textureUrl: string;
   size?: number;
   className?: string;
+  onClick?: () => void;
 }
 
 export function NpcFullBodyIcon({
   textureUrl,
   size = 64,
   className = "",
+  onClick,
 }: NpcFullBodyIconProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [failed, setFailed] = useState(false);
@@ -70,10 +72,11 @@ export function NpcFullBodyIcon({
   return (
     <canvas
       ref={canvasRef}
-      className={`inline-block ${className}`}
+      className={`inline-block ${onClick ? "cursor-pointer" : ""} ${className}`}
       style={{
         imageRendering: "pixelated",
       }}
+      onClick={onClick}
     />
   );
 }

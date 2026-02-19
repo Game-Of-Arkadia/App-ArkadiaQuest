@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, User, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { CoordinatesInput } from "@/components/CoordinatesInput";
 import { NpcHeadIcon } from "@/components/NpcHeadIcon";
@@ -24,6 +25,7 @@ interface NpcDashboardProps {
 }
 function buildQuestContext(characters: Character[], quests: Quest[]): Record<string, string[]> {
   const map: Record<string, string[]> = {};
+
   for (const c of characters) map[c.id] = [];
   for (const q of quests) {
     if (q.startingCharacterId) {
@@ -43,6 +45,7 @@ function buildQuestContext(characters: Character[], quests: Quest[]): Record<str
 
 export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: NpcDashboardProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const editingChar = characters.find((c) => c.id === editingId) ?? null;
   const questContext = useMemo(() => buildQuestContext(characters, quests), [characters, quests]);
   const handleNew = () => {
@@ -186,8 +189,8 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
         </Table>
       </ScrollArea>
       {/* Full editor sheet */}
-      <Sheet open={!!editingChar} onOpenChange={(open) => { if (!open) setEditingId(null); }}>
-        <SheetContent side="right" className="w-full sm:max-w-md p-0 flex flex-col">
+      <Sheet open={!!editingChar} onOpenChange={(open) => { if (!open) { setEditingId(null); setPreviewModalOpen(false); } }}>
+        <SheetContent side="right" className="w-full sm:max-w-lg p-0 flex flex-col">
           <SheetHeader className="p-4 pb-0">
             <SheetTitle className="flex items-center gap-2">
               {editingChar && <NpcHeadIcon textureUrl={editingChar.textureUrl} size={28} className="rounded-sm" />}
@@ -198,6 +201,29 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
           {editingChar && (
             <ScrollArea className="flex-1">
               <div className="p-4 space-y-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Texture URL</Label>
+                  <div className="flex gap-3 items-start">
+                    <div className="shrink-0 w-[48px] flex flex-col items-center">
+                      <NpcFullBodyIcon
+                        textureUrl={editingChar.textureUrl}
+                        size={128}
+                        className="rounded-sm border border-border hover:border-primary transition-colors"
+                        onClick={() => setPreviewModalOpen(true)}
+                      />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <Input
+                        value={editingChar.textureUrl}
+                        onChange={(e) => {
+                          onUpdate(editingChar.id, { textureUrl: e.target.value });
+                        }}
+                        className="h-8 text-sm"
+                        placeholder="https://…/skin.png"
+                      />
+                    </div>
+                  </div>
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <Label className="text-xs">Nom</Label>
@@ -242,7 +268,7 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
+                {/*<div className="space-y-1.5">
                   <Label className="text-xs">Texture URL</Label>
                   <div className="flex gap-2 items-center">
                     <Input
@@ -251,9 +277,8 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                       className="h-8 text-sm flex-1"
                       placeholder="https://…/skin.png"
                     />
-                    <NpcHeadIcon textureUrl={editingChar.textureUrl} size={32} className="rounded-sm border border-border" />
                   </div>
-                </div>
+                </div> */}
 
                 <div className="space-y-1.5">
                   <Label className="text-xs">Image Path</Label>
@@ -352,6 +377,13 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
           )}
         </SheetContent>
       </Sheet>
+      <Dialog open={previewModalOpen} onOpenChange={setPreviewModalOpen}>
+        <DialogContent className="sm:max-w-xs flex items-center justify-center p-8">
+          {editingChar?.textureUrl && (
+            <NpcFullBodyIcon textureUrl={editingChar.textureUrl} size={512} className="rounded" />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
