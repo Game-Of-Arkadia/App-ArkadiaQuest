@@ -68,7 +68,11 @@ export interface TalkToCharacterData {
   characterId: string;
 }
 
-export type StepData = GoSomewhereData | TalkToCharacterData;
+export interface CharacterSaysData {
+  characterId: string;
+}
+
+export type StepData = GoSomewhereData | TalkToCharacterData | CharacterSaysData;
 
 export interface QuestStep {
   id: string;
