@@ -46,9 +46,15 @@ function buildQuestContext(characters: Character[], quests: Quest[]): Record<str
 export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: NpcDashboardProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [previewTextureUrl, setPreviewTextureUrl] = useState<string>("");
   const [isValidUrl, setIsValid] = useState<boolean | null>(null);
   const editingChar = characters.find((c) => c.id === editingId) ?? null;
   const questContext = useMemo(() => buildQuestContext(characters, quests), [characters, quests]);
+  const openFullBodyPreview = (url: string) => {
+    if (!url) return;
+    setPreviewTextureUrl(url);
+    setPreviewModalOpen(true);
+  };
   const handleNew = () => {
     const newChar: Character = {
       id: crypto.randomUUID(),
@@ -126,7 +132,13 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
               characters.map((c) => (
                 <TableRow key={c.id}>
                   <TableCell className="p-1">
-                    <NpcHeadIcon textureUrl={c.textureUrl} size={24} className="rounded-sm" />
+                    <div className="cursor-pointer" onClick={() => openFullBodyPreview(c.textureUrl)}>
+                      <NpcHeadIcon
+                        textureUrl={c.textureUrl}
+                        size={24}
+                        className="rounded-sm hover:ring-1 hover:ring-primary transition-shadow"
+                      />
+                    </div>
                   </TableCell>
                   <TableCell className="p-1">
                     <Input
@@ -236,7 +248,7 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                           textureUrl={editingChar.textureUrl}
                           size={96}
                           className="rounded-sm border border-border hover:border-primary transition-colors"
-                          onClick={() => setPreviewModalOpen(true)}
+                          onClick={() => openFullBodyPreview(editingChar.textureUrl)}
                         />
                       ) : (
                         <div className="w-[48px] h-[96px] rounded-sm border border-dashed border-muted-foreground/30 flex items-center justify-center bg-muted/30">
@@ -407,8 +419,8 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
       </Sheet>
       <Dialog open={previewModalOpen} onOpenChange={setPreviewModalOpen}>
         <DialogContent className="sm:max-w-xs flex items-center justify-center p-8">
-          {editingChar?.textureUrl && (
-            <NpcFullBodyIcon textureUrl={editingChar.textureUrl} size={512} className="rounded" />
+          {previewTextureUrl && (
+            <NpcFullBodyIcon textureUrl={previewTextureUrl} size={256} className="rounded" />
           )}
         </DialogContent>
       </Dialog>
