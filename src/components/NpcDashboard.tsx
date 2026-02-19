@@ -52,7 +52,7 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
   const handleNew = () => {
     const newChar: Character = {
       id: crypto.randomUUID(),
-      name: "New Character",
+      name: "PNJ",
       characterId: "",
       npcCode: "",
       imagePath: "",
