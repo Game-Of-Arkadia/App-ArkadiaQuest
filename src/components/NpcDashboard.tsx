@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,8 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 import { CoordinatesInput } from "@/components/CoordinatesInput";
-import type { Character, CharacterGender } from "@/types/quest";
+import { NpcHeadIcon } from "@/components/NpcHeadIcon";
+import type { Character, CharacterGender, Quest } from "@/types/quest";
 
 interface NpcDashboardProps {
   characters: Character[];
@@ -19,7 +21,26 @@ interface NpcDashboardProps {
   onUpdate: (id: string, updates: Partial<Character>) => void;
   onDelete: (id: string) => void;
 }
-export function NpcDashboard({ characters, onAdd, onUpdate, onDelete }: NpcDashboardProps) {
+function buildQuestContext(characters: Character[], quests: Quest[]): Record<string, string[]> {
+  const map: Record<string, string[]> = {};
+  for (const c of characters) map[c.id] = [];
+  for (const q of quests) {
+    if (q.startingCharacterId) {
+      const char = characters.find((c) => c.characterId === q.startingCharacterId);
+      if (char && !map[char.id]?.includes(q.name)) map[char.id]?.push(q.name);
+    }
+    for (const step of q.steps) {
+      const data = step.data as any;
+      if (data?.characterId) {
+        const char = characters.find((c) => c.characterId === data.characterId);
+        if (char && !map[char.id]?.includes(q.name)) map[char.id]?.push(q.name);
+      }
+    }
+  }
+  return map;
+}
+
+export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: NpcDashboardProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const editingChar = characters.find((c) => c.id === editingId) ?? null;
   const handleNew = () => {

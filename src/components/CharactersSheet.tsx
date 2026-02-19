@@ -39,6 +39,7 @@ export function CharactersSheet({
       characterId: "",
       npcCode: "",
       imagePath: "",
+      textureUrl: "",
       gender: "male",
       x: 0,
       y: 0,
