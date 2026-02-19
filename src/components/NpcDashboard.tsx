@@ -316,16 +316,6 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                     />
                   </div>
                 </div> */}
-
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Image Path</Label>
-                  <Input
-                    value={editingChar.imagePath}
-                    onChange={(e) => onUpdate(editingChar.id, { imagePath: e.target.value })}
-                    className="h-8 text-sm"
-                    placeholder="/assets/character.png"
-                  />
-                </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs">Coordonnées</Label>
                   <CoordinatesInput
@@ -334,16 +324,6 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                     inputClassName="h-8 text-sm font-mono"
                   />
                   </div>
-                  <div className="space-y-1.5">
-                  <Label className="text-xs">Quest Context</Label>
-                  <div className="flex flex-wrap gap-1">
-                    {(questContext[editingChar.id] ?? []).length > 0
-                      ? questContext[editingChar.id].map((qn) => (
-                          <Badge key={qn} variant="secondary" className="text-xs">{qn}</Badge>
-                        ))
-                      : <span className="text-xs text-muted-foreground">-</span>}
-                  </div>
-                </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs">Information Supplémentaire</Label>
                   <div className="space-y-1">
@@ -379,6 +359,17 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                   </div>
                 </div>
                 <Separator />
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Image Path</Label>
+                  <Input
+                    value={editingChar.imagePath}
+                    onChange={(e) => onUpdate(editingChar.id, { imagePath: e.target.value })}
+                    className="h-8 text-sm"
+                    placeholder="/assets/character.png"
+                  />
+                </div>
+
                 <div className="space-y-1.5">
                   <Label className="text-xs">
                     YAML Configuration{!isSeed(editingChar.id) ? " Override" : ""}
