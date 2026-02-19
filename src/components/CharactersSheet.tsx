@@ -270,6 +270,16 @@ export function CharactersSheet({
         </div>
       </SheetContent>
     </Sheet>
+    <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="sm:max-w-xs flex flex-col items-center gap-4">
+          <DialogHeader>
+            <DialogTitle className="text-sm">{selected?.name ?? "Preview"}</DialogTitle>
+          </DialogHeader>
+          {selected?.textureUrl && (
+            <NpcFullBodyIcon textureUrl={selected.textureUrl} size={256} />
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
