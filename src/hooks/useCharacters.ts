@@ -15,6 +15,7 @@ function seedCharacters(): Character[] {
       characterId: "default",
       npcCode: "default",
       imagePath: "",
+      textureUrl: c.textureUrl ?? "",
       gender: "male",
       x: 0, y: 0, z: 0,
       otherInfo: [],
@@ -26,6 +27,7 @@ function seedCharacters(): Character[] {
       characterId: "ambiant",
       npcCode: "ambiant",
       imagePath: "",
+      textureUrl: "",
       gender: "male",
       x: 0, y: 0, z: 0,
       otherInfo: [],
@@ -42,6 +44,7 @@ function loadCharacters(): Character[] {
     chars = chars.map((c) => ({
       ...c,
       npcCode: c.npcCode ?? c.gameName ?? "",
+      textureUrl: c.textureUrl ?? "",
       gender: c.gender ?? "male",
       x: c.x ?? 0,
       y: c.y ?? 0,

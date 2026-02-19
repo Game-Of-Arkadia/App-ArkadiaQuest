@@ -81,6 +81,7 @@ const Index = () => {
         <div className="flex flex-1 min-h-0">
           <NpcDashboard
             characters={characters}
+            quests={quests}
             onAdd={addCharacter}
             onUpdate={updateCharacter}
             onDelete={deleteCharacter}

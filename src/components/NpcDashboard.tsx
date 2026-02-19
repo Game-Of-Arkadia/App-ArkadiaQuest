@@ -14,6 +14,7 @@ import type { Character, CharacterGender } from "@/types/quest";
 
 interface NpcDashboardProps {
   characters: Character[];
+  quests: Quest[];
   onAdd: (char: Character) => void;
   onUpdate: (id: string, updates: Partial<Character>) => void;
   onDelete: (id: string) => void;
@@ -28,6 +29,7 @@ export function NpcDashboard({ characters, onAdd, onUpdate, onDelete }: NpcDashb
       characterId: "",
       npcCode: "",
       imagePath: "",
+      textureUrl: "",
       gender: "male",
       x: 0, y: 0, z: 0,
       otherInfo: [],

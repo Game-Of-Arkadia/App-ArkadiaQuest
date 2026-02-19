@@ -6,6 +6,7 @@ export interface Character {
   characterId: string;
   npcCode: string;
   imagePath: string;
+   textureUrl: string;
   gender: CharacterGender;
   x: number;
   y: number;
