@@ -46,7 +46,7 @@ function buildQuestContext(characters: Character[], quests: Quest[]): Record<str
 export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: NpcDashboardProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
-  const [isValid, setIsValid] = useState<boolean | null>(null);
+  const [isValidUrl, setIsValid] = useState<boolean | null>(null);
   const editingChar = characters.find((c) => c.id === editingId) ?? null;
   const questContext = useMemo(() => buildQuestContext(characters, quests), [characters, quests]);
   const handleNew = () => {
@@ -231,12 +231,18 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                   <Label className="text-xs">Texture URL</Label>
                   <div className="flex gap-3 items-start">
                     <div className="shrink-0 w-[48px] flex flex-col items-center">
-                      <NpcFullBodyIcon
-                        textureUrl={editingChar.textureUrl}
-                        size={128}
-                        className="rounded-sm border border-border hover:border-primary transition-colors"
-                        onClick={() => setPreviewModalOpen(true)}
-                      />
+                      {isValidUrl ? (
+                        <NpcFullBodyIcon
+                          textureUrl={editingChar.textureUrl}
+                          size={96}
+                          className="rounded-sm border border-border hover:border-primary transition-colors"
+                          onClick={() => setPreviewModalOpen(true)}
+                        />
+                      ) : (
+                        <div className="w-[48px] h-[96px] rounded-sm border border-dashed border-muted-foreground/30 flex items-center justify-center bg-muted/30">
+                          <User className="h-5 w-5 text-muted-foreground/40" />
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1 space-y-1">
                       <Input
@@ -247,7 +253,7 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                         className="h-8 text-sm"
                         placeholder="https://…/skin.png"
                       />
-                      {isValid === false &&  (
+                      {isValidUrl === false &&  (
                         <p className="text-[11px] text-destructive flex items-center gap-1">
                           <AlertCircle className="h-3 w-3" /> Invalid texture URL - could not load image.
                         </p>
