@@ -79,10 +79,17 @@ export function useQuests() {
     setSelectedQuestId((prev) => (prev === id ? null : prev));
   }, []);
 
-  // Steps CRUD
-  const addStep = useCallback((questId: string, step: QuestStep) => {
+  const addStep = useCallback((questId: string, step: QuestStep, atIndex?: number) => {
     setQuests((prev) =>
-      prev.map((q) => q.id === questId ? { ...q, steps: [...q.steps, step] } : q)
+      prev.map((q) => {
+        if (q.id !== questId) return q;
+        if (atIndex !== undefined) {
+          const newSteps = [...q.steps];
+          newSteps.splice(atIndex, 0, step);
+          return { ...q, steps: newSteps };
+        }
+        return { ...q, steps: [...q.steps, step] };
+      })
     );
   }, []);
 

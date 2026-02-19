@@ -1,17 +1,15 @@
-import { useState, useRef, useCallback } from "react";
-import { Plus, MapPin, MessageCircle, Trash2, GripVertical } from "lucide-react";
+import { useState, useCallback } from "react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CoordinatesInput } from "@/components/CoordinatesInput";
-import type { Character, Quest, QuestStep, Dialogue, StepType, GoSomewhereData, TalkToCharacterData } from "@/types/quest";
+import { STEP_REGISTRY, INSERTABLE_STEP_TYPES } from "@/components/quest-steps/StepRegistry";
+import type { Character, Quest, QuestStep, Dialogue, StepType } from "@/types/quest";
 import { defaultStepData } from "@/types/quest";
 
 interface QuestDocumentEditorProps {
   quest: Quest;
   characters: Character[];
-  onAddStep: (questId: string, step: QuestStep) => void;
+  onAddStep: (questId: string, step: QuestStep, atIndex?: number) => void;
   onUpdateStep: (questId: string, stepId: string, updates: Partial<QuestStep>) => void;
   onDeleteStep: (questId: string, stepId: string) => void;
   onAddStepDialogue: (questId: string, stepId: string, dialogue: Dialogue) => void;
@@ -29,283 +27,80 @@ function InsertEventMenu({ onInsert }: { onInsert: (type: StepType) => void }) {
         </button>
       </PopoverTrigger>
       <PopoverContent side="left" align="start" className="w-48 p-1">
-        <button
-          className="w-full flex items-center gap-2 px-3 py-2 text-xs rounded-md hover:bg-accent transition-colors text-left"
-          onClick={() => { onInsert("talk_to_character"); setOpen(false); }}
-        >
-          <MessageCircle className="h-3.5 w-3.5 text-primary" />
-          Parler à un PNJ
-        </button>
-        <button
-          className="w-full flex items-center gap-2 px-3 py-2 text-xs rounded-md hover:bg-accent transition-colors text-left"
-          onClick={() => { onInsert("go_somewhere"); setOpen(false); }}
-        >
-          <MapPin className="h-3.5 w-3.5 text-primary" />
-          Se rendre à un endroit
-        </button>
+        {INSERTABLE_STEP_TYPES.map(([type, config]) => (
+          <button
+            key={type}
+            className="w-full flex items-center gap-2 px-3 py-2 text-xs rounded-md hover:bg-accent transition-colors text-left"
+            onClick={() => { onInsert(type); setOpen(false); }}
+          >
+            <span className="text-primary">{config.icon}</span>
+            {config.label}
+          </button>
+        ))}
       </PopoverContent>
     </Popover>
   );
 }
-function DialogueLine({
-  dialogue,
-  characters,
-  onUpdate,
-  onDelete,
-}: {
-  dialogue: Dialogue;
-  characters: Character[];
-  onUpdate: (updates: Partial<Dialogue>) => void;
-  onDelete: () => void;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  return (
-    <div className="group/line flex items-start gap-1 pl-6 py-0.5">
-      <span className="text-muted-foreground select-none mt-1 text-sm font-mono">-</span>
-      <input
-        ref={inputRef}
-        className="flex-1 bg-transparent border-none outline-none text-sm py-0.5 text-foreground placeholder:text-muted-foreground/50"
-        value={dialogue.text}
-        onChange={(e) => onUpdate({ text: e.target.value })}
-        placeholder="Écrire votre phrase de dialogue…"
-      />
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-5 w-5 opacity-0 group-hover/line:opacity-100 transition-opacity shrink-0 text-destructive/60 hover:text-destructive"
-        onClick={onDelete}
-      >
-        <Trash2 className="h-2.5 w-2.5" />
-      </Button>
-    </div>
-  );
-}
-function TalkToCharacterBlock({
-  step,
-  questId,
-  characters,
-  onUpdateStep,
-  onDeleteStep,
-  onAddDialogue,
-  onUpdateDialogue,
-  onDeleteDialogue,
-}: {
-  step: QuestStep;
-  questId: string;
-  characters: Character[];
-  onUpdateStep: (questId: string, stepId: string, updates: Partial<QuestStep>) => void;
-  onDeleteStep: (questId: string, stepId: string) => void;
-  onAddDialogue: (questId: string, stepId: string, dialogue: Dialogue) => void;
-  onUpdateDialogue: (questId: string, stepId: string, dialogueId: string, updates: Partial<Dialogue>) => void;
-  onDeleteDialogue: (questId: string, stepId: string, dialogueId: string) => void;
-}) {
-  const data = step.data as TalkToCharacterData;
-  const selectedChar = characters.find((c) => c.id === data.characterId);
-  const handleAddLine = () => {
-    onAddDialogue(questId, step.id, {
-      id: crypto.randomUUID(),
-      characterId: data.characterId || "",
-      text: "",
-    });
-  };
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, dialogueIndex: number) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddLine();
-    }
-    if (e.key === "Backspace" && (e.target as HTMLInputElement).value === "" && step.dialogues.length > 0) {
-      e.preventDefault();
-      const d = step.dialogues[dialogueIndex];
-      if (d) onDeleteDialogue(questId, step.id, d.id);
-    }
-  };
-  return (
-    <div className="group/event relative border-l-2 border-primary/30 rounded-r-md bg-primary/[0.03] py-2 px-3 my-1">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-1 right-1 h-5 w-5 opacity-0 group-hover/event:opacity-100 transition-opacity text-destructive/60 hover:text-destructive"
-        onClick={() => onDeleteStep(questId, step.id)}
-      >
-        <Trash2 className="h-3 w-3" />
-      </Button>
-      <div className="flex items-center gap-1.5 flex-wrap">
-        <span className="text-primary font-medium text-sm select-none">→ Parler à </span>
-        <Select
-          value={data.characterId || ""}
-          onValueChange={(v) =>
-            onUpdateStep(questId, step.id, { data: { ...data, characterId: v } })
-          }
-        >
-          <SelectTrigger className="h-6 text-xs w-36 border-dashed bg-background/60">
-            <SelectValue/>
-          </SelectTrigger>
-          <SelectContent>
-            {characters.map((c) => (
-              <SelectItem key={c.id} value={c.id}>
-                {c.name} ({c.npcCode})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="mt-1">
-        {step.dialogues.map((d, i) => (
-          <div key={d.id} onKeyDown={(e) => handleKeyDown(e as any, i)}>
-            <DialogueLine
-              dialogue={d}
-              characters={characters}
-              onUpdate={(updates) => onUpdateDialogue(questId, step.id, d.id, updates)}
-              onDelete={() => onDeleteDialogue(questId, step.id, d.id)}
-            />
-          </div>
-        ))}
-      </div>
-      <button
-        className="flex items-center gap-1 pl-6 py-0.5 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
-        onClick={handleAddLine}
-      >
-        <Plus className="h-2.5 w-2.5" /> Nouvelle phrase
-      </button>
-    </div>
-  );
-}
-/* Note: both "talk_to_character" steps use the same data shape.
-   If the step has a single dialogue, I present it as "[Character] says:" style.
-   For multiple dialogues I use the "Talk to [Character]" style.
-   This is handled automatically: steps with 0-1 dialogues initially look like "says:" style
-   but the user can always add more lines. */
-function GoSomewhereBlock({
-  step,
-  questId,
-  onUpdateStep,
-  onDeleteStep,
-}: {
-  step: QuestStep;
-  questId: string;
-  onUpdateStep: (questId: string, stepId: string, updates: Partial<QuestStep>) => void;
-  onDeleteStep: (questId: string, stepId: string) => void;
-}) {
-  const data = step.data as GoSomewhereData;
-  return (
-    <div className="group/event relative border-l-2 border-accent-foreground/30 rounded-r-md bg-accent/[0.06] py-2 px-3 my-1">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-1 right-1 h-5 w-5 opacity-0 group-hover/event:opacity-100 transition-opacity text-destructive/60 hover:text-destructive"
-        onClick={() => onDeleteStep(questId, step.id)}
-      >
-        <Trash2 className="h-3 w-3" />
-      </Button>
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-accent-foreground font-medium text-sm select-none flex items-center gap-1">
-          <MapPin className="h-3.5 w-3.5" /> → Se rendre à
-        </span>
-        <CoordinatesInput
-          x={data.x}
-          y={data.y}
-          z={data.z}
-          onChange={(coords) =>
-            onUpdateStep(questId, step.id, { data: { ...data, ...coords } })
-          }
-          inputClassName="h-6 text-xs font-mono w-32 bg-background/60 border-dashed"
-        />
-        <div className="flex items-center gap-1">
-          <span className="text-[10px] text-muted-foreground select-none">radius:</span>
-          <Input
-            type="number"
-            value={data.radius}
-            onChange={(e) =>
-              onUpdateStep(questId, step.id, {
-                data: { ...data, radius: parseFloat(e.target.value) || 0 },
-              })
-            }
-            className="h-6 text-xs w-16 font-mono bg-background/60 border-dashed"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
+
 export function QuestDocumentEditor({
-  quest,
-  characters,
-  onAddStep,
-  onUpdateStep,
-  onDeleteStep,
-  onAddStepDialogue,
-  onUpdateStepDialogue,
-  onDeleteStepDialogue,
+  quest, characters,
+  onAddStep, onUpdateStep, onDeleteStep,
+  onAddStepDialogue, onUpdateStepDialogue, onDeleteStepDialogue,
 }: QuestDocumentEditorProps) {
   const handleInsert = useCallback(
-    (type: StepType, afterIndex?: number) => {
+    (type: StepType, atIndex?: number) => {
+      const config = STEP_REGISTRY[type];
       const newStep: QuestStep = {
         id: crypto.randomUUID(),
         type,
         data: defaultStepData(type),
-        dialogues:
-          type === "talk_to_character"
-            ? [{ id: crypto.randomUUID(), characterId: "", text: "" }]
-            : [],
+        dialogues: config.hasDialogues
+          ? [{ id: crypto.randomUUID(), characterId: "", text: "" }]
+          : [],
       };
-      onAddStep(quest.id, newStep);
+      onAddStep(quest.id, newStep, atIndex);
     },
     [quest.id, onAddStep]
   );
+
   return (
     <div className="flex-1 flex flex-col min-h-0">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto py-6 px-4">
           {quest.steps.length === 0 && (
             <div className="text-center py-12 text-muted-foreground/60">
-              <p className="text-sm mb-3">Commencez à écrire votre quête.</p>
-              <div className="flex gap-2 justify-center">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-xs gap-1"
-                  onClick={() => handleInsert("talk_to_character")}
-                >
-                  <MessageCircle className="h-3 w-3" /> Parler à un PNJ
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-xs gap-1"
-                  onClick={() => handleInsert("go_somewhere")}
-                >
-                  <MapPin className="h-3 w-3" /> Se rendre à un endroit
-                </Button>
+              <p className="text-sm mb-3">Start writing your quest script.</p>
+              <div className="flex gap-2 justify-center flex-wrap">
+                {INSERTABLE_STEP_TYPES.map(([type, config]) => (
+                  <Button key={type} variant="outline" size="sm" className="text-xs gap-1" onClick={() => handleInsert(type)}>
+                    {config.icon} {config.label}
+                  </Button>
+                ))}
               </div>
             </div>
           )}
-          {quest.steps.map((step, idx) => (
-            <div key={step.id} className="group/insert relative">
-              <div className="absolute -left-7 top-1/2 -translate-y-1/2 z-10">
-                <InsertEventMenu onInsert={(type) => handleInsert(type, idx)} />
+
+          {quest.steps.map((step, idx) => {
+            const config = STEP_REGISTRY[step.type];
+            return (
+              <div key={step.id} className="group/insert relative">
+                <div className="absolute -left-7 top-1/2 -translate-y-1/2 z-10">
+                  <InsertEventMenu onInsert={(type) => handleInsert(type, idx)} />
+                </div>
+                {config.component({
+                  step,
+                  questId: quest.id,
+                  characters,
+                  onUpdateStep,
+                  onDeleteStep,
+                  onAddDialogue: onAddStepDialogue,
+                  onUpdateDialogue: onUpdateStepDialogue,
+                  onDeleteDialogue: onDeleteStepDialogue,
+                })}
               </div>
-              {step.type === "talk_to_character" && (
-                <TalkToCharacterBlock
-                  step={step}
-                  questId={quest.id}
-                  characters={characters}
-                  onUpdateStep={onUpdateStep}
-                  onDeleteStep={onDeleteStep}
-                  onAddDialogue={onAddStepDialogue}
-                  onUpdateDialogue={onUpdateStepDialogue}
-                  onDeleteDialogue={onDeleteStepDialogue}
-                />
-              )}
-              {step.type === "go_somewhere" && (
-                <GoSomewhereBlock
-                  step={step}
-                  questId={quest.id}
-                  onUpdateStep={onUpdateStep}
-                  onDeleteStep={onDeleteStep}
-                />
-              )}
-            </div>
-          ))}
+            );
+          })}
+
           {quest.steps.length > 0 && (
             <div className="group/insert relative py-2">
               <div className="absolute -left-7 top-1/2 -translate-y-1/2 z-10">

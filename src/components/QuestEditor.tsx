@@ -20,7 +20,7 @@ interface QuestEditorProps {
   currentUser: string;
   onUpdateQuest: (id: string, updates: Partial<Quest>) => void;
   onEditQuestProperties: () => void;
-  onAddStep: (questId: string, step: QuestStep) => void;
+  onAddStep: (questId: string, step: QuestStep, atIndex?: number) => void;
   onUpdateStep: (questId: string, stepId: string, updates: Partial<QuestStep>) => void;
   onDeleteStep: (questId: string, stepId: string) => void;
   onAddStepDialogue: (questId: string, stepId: string, dialogue: Dialogue) => void;

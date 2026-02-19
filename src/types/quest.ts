@@ -55,7 +55,7 @@ export function defaultRequirementData(type: RequirementType): QuestRequirement 
 }
 
 // Step types — extensible: add new type strings + matching data interfaces
-export type StepType = "go_somewhere" | "talk_to_character";
+export type StepType = "go_somewhere" | "talk_to_character" | "character_says";
 
 export interface GoSomewhereData {
   x: number;
@@ -144,10 +144,13 @@ export function defaultStepData(type: StepType): StepData {
       return { x: 0, y: 0, z: 0, radius: 5 };
     case "talk_to_character":
       return { characterId: "" };
+    case "character_says":
+      return { characterId: "" };
   }
 }
 
 export const STEP_TYPE_LABELS: Record<StepType, string> = {
   go_somewhere: "Aller à un certain endroit",
   talk_to_character: "Parler à un NPC",
+  character_says: "Un personnage dit",
 };
