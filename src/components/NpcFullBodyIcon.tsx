@@ -80,3 +80,38 @@ export function NpcFullBodyIcon({
     />
   );
 }
+
+export async function validateMinecraftSkin(
+  textureUrl: string
+): Promise<boolean> {
+  if (!textureUrl)
+    return false;
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+
+    const timeout = setTimeout(() => {
+      resolve(false);
+    }, 5000);
+
+    img.onload = () => {
+      clearTimeout(timeout);
+
+      const { width, height } = img;
+
+      const isValidSize = (width === 64 && height === 64) || (width === 64 && height === 32);
+
+      resolve(isValidSize);
+    };
+
+    img.onerror = () => {
+      clearTimeout(timeout);
+      resolve(false);
+    };
+
+    img.src = `http://localhost:3001/api/skin?url=${encodeURIComponent(
+      textureUrl
+    )}`;
+  });
+}

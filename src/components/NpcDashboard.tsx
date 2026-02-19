@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Plus, Pencil, Trash2, User, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { CoordinatesInput } from "@/components/CoordinatesInput";
 import { NpcHeadIcon } from "@/components/NpcHeadIcon";
-import { NpcFullBodyIcon } from "@/components/NpcFullBodyIcon";
+import { NpcFullBodyIcon, validateMinecraftSkin } from "@/components/NpcFullBodyIcon";
 import type { Character, CharacterGender, Quest } from "@/types/quest";
 
 interface NpcDashboardProps {
@@ -46,6 +46,7 @@ function buildQuestContext(characters: Character[], quests: Quest[]): Record<str
 export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: NpcDashboardProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [isValid, setIsValid] = useState<boolean | null>(null);
   const editingChar = characters.find((c) => c.id === editingId) ?? null;
   const questContext = useMemo(() => buildQuestContext(characters, quests), [characters, quests]);
   const handleNew = () => {
@@ -64,6 +65,31 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
     onAdd(newChar);
   };
   const isSeed = (id: string) => id === "__default__" || id === "__ambiant__";
+
+  useEffect(() => {
+    const url = editingChar?.textureUrl;
+
+    if (!url) {
+      setIsValid(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function validate() {
+      const result = await validateMinecraftSkin(url);
+      if (!cancelled) {
+        setIsValid(result);
+      }
+    }
+
+    validate();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [editingChar?.textureUrl]);
+
 
   return (
     <div className="flex-1 flex flex-col min-h-0 p-4">
@@ -221,6 +247,11 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                         className="h-8 text-sm"
                         placeholder="https://…/skin.png"
                       />
+                      {isValid === false &&  (
+                        <p className="text-[11px] text-destructive flex items-center gap-1">
+                          <AlertCircle className="h-3 w-3" /> Invalid texture URL - could not load image.
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
