@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Trash2, User } from "lucide-react";
+import { Plus, Trash2, User, ImageOff } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import type { Character, CharacterGender } from "@/types/quest";
 import { DEFAULT_YAML_CONFIG, AMBIANT_YAML_CONFIG } from "@/types/quest";
+import { NpcFullBodyIcon } from "@/components/NpcFullBodyIcon";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface CharactersSheetProps {
   open: boolean;
@@ -30,6 +32,7 @@ export function CharactersSheet({
   onDelete,
 }: CharactersSheetProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const selected = characters.find((c) => c.id === selectedId) ?? null;
 
   const handleNew = () => {
@@ -52,8 +55,9 @@ export function CharactersSheet({
   };
 
   return (
+    <>
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-2xl p-0 flex flex-col">
+      <SheetContent side="right" className="w-full sm:max-w-3xl p-0 flex flex-col">
         <SheetHeader className="p-4 pb-0">
           <SheetTitle>PNJ Arkadia</SheetTitle>
           <SheetDescription>List des PNJ disponibles dans Arkadia</SheetDescription>
@@ -266,5 +270,6 @@ export function CharactersSheet({
         </div>
       </SheetContent>
     </Sheet>
+    </>
   );
 }
