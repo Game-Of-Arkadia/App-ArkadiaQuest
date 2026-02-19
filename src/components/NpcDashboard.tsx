@@ -43,6 +43,7 @@ function buildQuestContext(characters: Character[], quests: Quest[]): Record<str
 export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: NpcDashboardProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const editingChar = characters.find((c) => c.id === editingId) ?? null;
+  const questContext = useMemo(() => buildQuestContext(characters, quests), [characters, quests]);
   const handleNew = () => {
     const newChar: Character = {
       id: crypto.randomUUID(),
@@ -73,12 +74,14 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-xs w-16">Character ID</TableHead>
+              <TableHead className="text-xs w-10" />
+              <TableHead className="text-xs w-14">ID</TableHead>
               <TableHead className="text-xs w-60">Nom</TableHead>
               <TableHead className="text-xs w-64">Code du PNJ</TableHead>
               <TableHead className="text-xs w-28">Gender</TableHead>
               <TableHead className="text-xs w-40">Coordinates</TableHead>
               <TableHead className="text-xs">Information Supplémentaire</TableHead>
+              <TableHead className="text-xs">Quests</TableHead>
               <TableHead className="text-xs w-20" />
             </TableRow>
           </TableHeader>
@@ -92,6 +95,9 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
             ) : (
               characters.map((c) => (
                 <TableRow key={c.id}>
+                  <TableCell className="p-1">
+                    <NpcHeadIcon textureUrl={c.textureUrl} size={24} className="rounded-sm" />
+                  </TableCell>
                   <TableCell className="p-1">
                     <Input
                       value={c.characterId}
@@ -140,6 +146,17 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                     </div>
                   </TableCell>
                   <TableCell className="p-1">
+                    <div className="flex flex-wrap gap-0.5 max-w-[160px]">
+                      {(questContext[c.id] ?? []).length > 0
+                        ? questContext[c.id].map((qn) => (
+                            <Badge key={qn} variant="secondary" className="text-[10px] px-1 py-0">
+                              {qn}
+                            </Badge>
+                          ))
+                        : <span className="text-xs text-muted-foreground">—</span>}
+                    </div>
+                  </TableCell>
+                  <TableCell className="p-1">
                     <div className="flex gap-0.5 justify-end">
                       <Button
                         variant="ghost"
@@ -171,7 +188,10 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
       <Sheet open={!!editingChar} onOpenChange={(open) => { if (!open) setEditingId(null); }}>
         <SheetContent side="right" className="w-full sm:max-w-md p-0 flex flex-col">
           <SheetHeader className="p-4 pb-0">
-            <SheetTitle>{editingChar?.name ?? "Configuration du PNJ"}</SheetTitle>
+            <SheetTitle className="flex items-center gap-2">
+              {editingChar && <NpcHeadIcon textureUrl={editingChar.textureUrl} size={28} className="rounded-sm" />}
+              {editingChar?.name ?? "Edit NPC"}
+            </SheetTitle>
             <SheetDescription>Configuration complète du PNJ</SheetDescription>
           </SheetHeader>
           {editingChar && (
@@ -220,6 +240,20 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                     </Select>
                   </div>
                 </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Texture URL</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      value={editingChar.textureUrl}
+                      onChange={(e) => onUpdate(editingChar.id, { textureUrl: e.target.value })}
+                      className="h-8 text-sm flex-1"
+                      placeholder="https://…/skin.png"
+                    />
+                    <NpcHeadIcon textureUrl={editingChar.textureUrl} size={32} className="rounded-sm border border-border" />
+                  </div>
+                </div>
+
                 <div className="space-y-1.5">
                   <Label className="text-xs">Image Path</Label>
                   <Input
@@ -236,6 +270,16 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                     onChange={(coords) => onUpdate(editingChar.id, coords)}
                     inputClassName="h-8 text-sm font-mono"
                   />
+                  </div>
+                  <div className="space-y-1.5">
+                  <Label className="text-xs">Quest Context</Label>
+                  <div className="flex flex-wrap gap-1">
+                    {(questContext[editingChar.id] ?? []).length > 0
+                      ? questContext[editingChar.id].map((qn) => (
+                          <Badge key={qn} variant="secondary" className="text-xs">{qn}</Badge>
+                        ))
+                      : <span className="text-xs text-muted-foreground">-</span>}
+                  </div>
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs">Information Supplémentaire</Label>
@@ -252,15 +296,10 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                           className="h-7 text-xs flex-1"
                           placeholder="Info…"
                         />
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 shrink-0 text-destructive"
-                          onClick={() => {
-                            const updated = editingChar.otherInfo.filter((_, i) => i !== idx);
-                            onUpdate(editingChar.id, { otherInfo: updated });
-                          }}
-                        >
+                        <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-destructive" onClick={() => {
+                          const updated = editingChar.otherInfo.filter((_, i) => i !== idx);
+                          onUpdate(editingChar.id, { otherInfo: updated });
+                        }}>
                           <Trash2 className="h-3 w-3" />
                         </Button>
                       </div>
