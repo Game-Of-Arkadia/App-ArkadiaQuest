@@ -23,25 +23,6 @@ interface NpcDashboardProps {
   onUpdate: (id: string, updates: Partial<Character>) => void;
   onDelete: (id: string) => void;
 }
-function buildQuestContext(characters: Character[], quests: Quest[]): Record<string, string[]> {
-  const map: Record<string, string[]> = {};
-
-  for (const c of characters) map[c.id] = [];
-  for (const q of quests) {
-    if (q.startingCharacterId) {
-      const char = characters.find((c) => c.characterId === q.startingCharacterId);
-      if (char && !map[char.id]?.includes(q.name)) map[char.id]?.push(q.name);
-    }
-    for (const step of q.steps) {
-      const data = step.data as any;
-      if (data?.characterId) {
-        const char = characters.find((c) => c.characterId === data.characterId);
-        if (char && !map[char.id]?.includes(q.name)) map[char.id]?.push(q.name);
-      }
-    }
-  }
-  return map;
-}
 
 export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: NpcDashboardProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -49,7 +30,6 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
   const [previewTextureUrl, setPreviewTextureUrl] = useState<string>("");
   const [isValidUrl, setIsValid] = useState<boolean | null>(null);
   const editingChar = characters.find((c) => c.id === editingId) ?? null;
-  const questContext = useMemo(() => buildQuestContext(characters, quests), [characters, quests]);
   const openFullBodyPreview = (url: string) => {
     if (!url) return;
     setPreviewTextureUrl(url);
@@ -122,7 +102,6 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
               <TableHead className="text-xs w-28">Gender</TableHead>
               <TableHead className="text-xs w-40">Coordinates</TableHead>
               <TableHead className="text-xs">Information Supplémentaire</TableHead>
-              <TableHead className="text-xs">Quests</TableHead>
               <TableHead className="text-xs w-20" />
             </TableRow>
           </TableHeader>
@@ -190,17 +169,6 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                   <TableCell className="p-1">
                     <div className="text-xs text-muted-foreground">
                       {c.otherInfo.length > 0 ? c.otherInfo.join("; ") : "—"}
-                    </div>
-                  </TableCell>
-                  <TableCell className="p-1">
-                    <div className="flex flex-wrap gap-0.5 max-w-[160px]">
-                      {(questContext[c.id] ?? []).length > 0
-                        ? questContext[c.id].map((qn) => (
-                            <Badge key={qn} variant="secondary" className="text-[10px] px-1 py-0">
-                              {qn}
-                            </Badge>
-                          ))
-                        : <span className="text-xs text-muted-foreground">—</span>}
                     </div>
                   </TableCell>
                   <TableCell className="p-1">
