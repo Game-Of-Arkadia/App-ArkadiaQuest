@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { User } from "lucide-react";
 
 interface NpcHeadIconProps {
   textureUrl: string;
@@ -10,7 +11,11 @@ export function NpcHeadIcon({ textureUrl, size = 24, className = "" }: NpcHeadIc
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [failed, setFailed] = useState(false);
   useEffect(() => {
-    if (!textureUrl) return;
+    if (!textureUrl) {
+      setFailed(true);
+      return;
+    }
+
     setFailed(false);
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -28,8 +33,19 @@ export function NpcHeadIcon({ textureUrl, size = 24, className = "" }: NpcHeadIc
     img.src = `http://localhost:3001/api/skin?url=${encodeURIComponent(textureUrl)}`;
   }, [textureUrl, size]);
 
-  if (!textureUrl || failed)
-    return null;
+  if (!textureUrl || failed) {
+    return (
+      <div
+        className="rounded-sm border border-dashed border-muted-foreground/30 flex items-center justify-center bg-muted/30"
+        style={{ width: size, height: size }}
+      >
+        <User
+          className="text-muted-foreground/40"
+          style={{ width: size * 0.8, height: size * 0.8 }}
+        />
+      </div>
+    );
+  }
 
   return (
     <canvas
