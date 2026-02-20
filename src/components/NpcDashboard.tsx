@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Plus, Pencil, Trash2, User, AlertCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, User, AlertCircle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { CoordinatesInput } from "@/components/CoordinatesInput";
 import { NpcHeadIcon } from "@/components/NpcHeadIcon";
 import { NpcFullBodyIcon, validateMinecraftSkin } from "@/components/NpcFullBodyIcon";
@@ -22,6 +21,20 @@ interface NpcDashboardProps {
   onAdd: (char: Character) => void;
   onUpdate: (id: string, updates: Partial<Character>) => void;
   onDelete: (id: string) => void;
+}
+
+function TpButton({ x, y, z }: { x: number; y: number; z: number }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(`/tp @p ${x} ${y} ${z}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+  return (
+    <Button variant="outline" size="sm" className="h-7 px-1.5 text-[10px] font-mono shrink-0" onClick={handleCopy} title="Copy /tp command">
+      {copied ? <Check className="h-3 w-3 text-green-500" /> : <span>tp</span>}
+    </Button>
+  );
 }
 
 export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: NpcDashboardProps) {
@@ -100,7 +113,7 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
               <TableHead className="text-xs w-60">Nom</TableHead>
               <TableHead className="text-xs w-64">Code du PNJ</TableHead>
               <TableHead className="text-xs w-28">Gender</TableHead>
-              <TableHead className="text-xs w-40">Coordinates</TableHead>
+              <TableHead className="text-xs w-56">Coordinates</TableHead>
               <TableHead className="text-xs">Information Supplémentaire</TableHead>
               <TableHead className="text-xs w-20" />
             </TableRow>
@@ -108,7 +121,7 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
           <TableBody>
             {characters.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center text-sm text-muted-foreground py-8">
+                <TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-8">
                   Aucun personnage trouvé. Cliquez sur "Nouveau PNJ" pour en ajouter un.
                 </TableCell>
               </TableRow>
@@ -160,11 +173,14 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                     </Select>
                   </TableCell>
                   <TableCell className="p-1">
-                    <CoordinatesInput
-                      x={c.x} y={c.y} z={c.z}
-                      onChange={(coords) => onUpdate(c.id, coords)}
-                      inputClassName="h-7 text-xs w-40 font-mono"
-                    />
+                    <div className="flex items-start gap-1">
+                      <CoordinatesInput
+                        x={c.x} y={c.y} z={c.z}
+                        onChange={(coords) => onUpdate(c.id, coords)}
+                        inputClassName="h-7 text-xs w-40 font-mono"
+                      />
+                      <TpButton x={c.x} y={c.y} z={c.z} />
+                    </div>
                   </TableCell>
                   <TableCell className="p-1">
                     <div className="text-xs text-muted-foreground">
@@ -303,11 +319,16 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                 </div> */}
                 <div className="space-y-1.5">
                   <Label className="text-xs">Coordonnées</Label>
-                  <CoordinatesInput
-                    x={editingChar.x} y={editingChar.y} z={editingChar.z}
-                    onChange={(coords) => onUpdate(editingChar.id, coords)}
-                    inputClassName="h-8 text-sm font-mono"
-                  />
+                  <div className="flex items-start gap-1">
+                    <CoordinatesInput
+                      x={editingChar.x}
+                      y={editingChar.y}
+                      z={editingChar.z}
+                      onChange={(coords) => onUpdate(editingChar.id, coords)}
+                      inputClassName="h-8 text-sm font-mono"
+                      className="flex-1"
+                    />
+                    <TpButton x={editingChar.x} y={editingChar.y} z={editingChar.z} />
                   </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs">Information Supplémentaire</Label>
@@ -385,6 +406,7 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
                     <Trash2 className="h-3 w-3 mr-1" /> Delete PNJ
                   </Button>
                 )}
+                </div>
               </div>
             </ScrollArea>
           )}
