@@ -425,7 +425,7 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
       <Dialog open={previewModalOpen} onOpenChange={setPreviewModalOpen}>
         <DialogContent className="sm:max-w-xs flex items-center justify-center p-8">
           {previewTextureUrl && (
-            <NpcFullBodyIcon textureUrl={previewTextureUrl} size={256} className="rounded" />
+            <NpcFullBodyIcon textureUrl={previewTextureUrl} size={512} className="rounded" />
           )}
         </DialogContent>
       </Dialog>
