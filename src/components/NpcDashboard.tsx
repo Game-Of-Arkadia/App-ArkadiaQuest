@@ -366,14 +366,14 @@ export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete,
                   <div className="space-y-1">
                     {(editingChar.otherInfo || []).map((info, idx) => (
                       <div key={idx} className="flex gap-1">
-                        <Input
+                        <Textarea
                           value={info}
                           onChange={(e) => {
                             const updated = [...editingChar.otherInfo];
                             updated[idx] = e.target.value;
                             onUpdate(editingChar.id, { otherInfo: updated });
                           }}
-                          className="h-7 text-xs flex-1"
+                          className="min-h-[7px] text-xs flex-1 resize-y"
                           placeholder="Info…"
                         />
                         <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-destructive" onClick={() => {
