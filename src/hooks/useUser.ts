@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 
-const COOKIE_NAME = "quest-designer-user";
-const USERS_KEY = "quest-designer-users";
+const COOKIE_NAME = "ArkadiaQuestUser";
+const USERS_KEY = "ArkadiaQuestUsers";
 
 function getCookie(name: string): string | null {
   const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));

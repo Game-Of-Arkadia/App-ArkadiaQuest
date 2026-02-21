@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
-import { Plus, Pencil, Trash2, User, AlertCircle, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Pencil, Trash2, User, AlertCircle, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,14 +13,19 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { CoordinatesInput } from "@/components/CoordinatesInput";
 import { NpcHeadIcon } from "@/components/NpcHeadIcon";
 import { NpcFullBodyIcon, validateMinecraftSkin } from "@/components/NpcFullBodyIcon";
-import type { Character, CharacterGender, Quest } from "@/types/quest";
+import { GroupFormModal } from "@/components/GroupFormModal";
+import { cn } from "@/lib/utils";
+import type { Character, CharacterGender, NpcGroup } from "@/types/quest";
+import { SYSTEM_NPC_GROUP_ID } from "@/types/quest";
 
 interface NpcDashboardProps {
   characters: Character[];
-  quests: Quest[];
+  npcGroups: NpcGroup[];
   onAdd: (char: Character) => void;
   onUpdate: (id: string, updates: Partial<Character>) => void;
   onDelete: (id: string) => void;
+  onAddGroup: (group: NpcGroup) => void;
+  onDeleteGroup: (id: string) => void;
 }
 
 function TpButton({ x, y, z }: { x: number; y: number; z: number }) {
@@ -37,12 +42,15 @@ function TpButton({ x, y, z }: { x: number; y: number; z: number }) {
   );
 }
 
-export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: NpcDashboardProps) {
+export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete, onAddGroup, onDeleteGroup }: NpcDashboardProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [previewTextureUrl, setPreviewTextureUrl] = useState<string>("");
   const [isValidUrl, setIsValid] = useState<boolean | null>(null);
+  const [selectedGroupId, setSelectedGroupId] = useState<string>(SYSTEM_NPC_GROUP_ID);
+  const [groupModalOpen, setGroupModalOpen] = useState(false);
   const editingChar = characters.find((c) => c.id === editingId) ?? null;
+  const filteredCharacters = characters.filter((c) => c.groupId === selectedGroupId);
   const openFullBodyPreview = (url: string) => {
     if (!url) return;
     setPreviewTextureUrl(url);
@@ -65,6 +73,7 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
       x: 0, y: 0, z: 0,
       otherInfo: [],
       yamlConfig: "",
+      groupId: selectedGroupId,
     };
     onAdd(newChar);
   };
@@ -99,10 +108,32 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
     <div className="flex-1 flex flex-col min-h-0 p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Dashboard PNJ</h2>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => setGroupModalOpen(true)}>
+            <Plus className="h-3 w-3 mr-1" /> Group
+          </Button>
+          {npcGroups.map((g) => (
+            <div key={g.id} className="flex items-center gap-1">
+              <button
+                key={g.id}
+                onClick={() => setSelectedGroupId(g.id)}
+                className={cn(
+                  "px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
+                  selectedGroupId === g.id
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                )}
+              >
+                {g.name}
+              </button>
+        </div>
+          ))}
+        </div>
         <Button variant="outline" size="sm" className="text-xs" onClick={handleNew}>
           <Plus className="h-3 w-3 mr-1" /> Nouveau PNJ
         </Button>
       </div>
+      <div className="flex items-center justify-between mb-2"></div>
 
       <ScrollArea className="flex-1">
         <Table>
@@ -119,14 +150,14 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
             </TableRow>
           </TableHeader>
           <TableBody>
-            {characters.length === 0 ? (
+            {filteredCharacters.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-8">
                   Aucun personnage trouvé. Cliquez sur "Nouveau PNJ" pour en ajouter un.
                 </TableCell>
               </TableRow>
             ) : (
-              characters.map((c) => (
+              filteredCharacters.map((c) => (
                 <TableRow key={c.id}>
                   <TableCell className="p-1">
                     <div className="cursor-pointer" onClick={() => openFullBodyPreview(c.textureUrl)}>
@@ -419,6 +450,11 @@ export function NpcDashboard({ characters, quests, onAdd, onUpdate, onDelete }: 
           )}
         </DialogContent>
       </Dialog>
+      <GroupFormModal
+        open={groupModalOpen}
+        onOpenChange={setGroupModalOpen}
+        onSubmit={({ name, color }) => onAddGroup({ id: crypto.randomUUID(), name, color })}
+      />
     </div>
   );
 }

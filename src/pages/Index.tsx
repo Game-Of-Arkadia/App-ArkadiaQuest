@@ -19,8 +19,7 @@ const Index = () => {
   const [questModalGroupId, setQuestModalGroupId] = useState("");
   const [groupModalOpen, setGroupModalOpen] = useState(false);
 
-  const { characters, addCharacter, updateCharacter, deleteCharacter } = useCharacters();
-  const {
+  const { characters, addCharacter, updateCharacter, deleteCharacter, npcGroups, addNpcGroup, deleteNpcGroup } = useCharacters();  const {
     groups,
     quests,
     addGroup,
@@ -80,10 +79,12 @@ const Index = () => {
         <div className="flex flex-1 min-h-0">
           <NpcDashboard
             characters={characters}
-            quests={quests}
+            npcGroups={npcGroups}
             onAdd={addCharacter}
             onUpdate={updateCharacter}
             onDelete={deleteCharacter}
+            onAddGroup={addNpcGroup}
+            onDeleteGroup={deleteNpcGroup}
           />
         </div>
       )}

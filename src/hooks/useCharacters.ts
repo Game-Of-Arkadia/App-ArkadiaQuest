@@ -1,8 +1,9 @@
 import { useState, useCallback, useEffect } from "react";
-import type { Character } from "@/types/quest";
-import { DEFAULT_YAML_CONFIG, AMBIANT_YAML_CONFIG } from "@/types/quest";
+import type { Character, NpcGroup } from "@/types/quest";
+import { DEFAULT_YAML_CONFIG, AMBIANT_YAML_CONFIG, SYSTEM_NPC_GROUP_ID, GROUP_COLORS } from "@/types/quest";
 
-const STORAGE_KEY = "quest-designer-characters";
+const STORAGE_KEY = "ArkadiaQuestNPCs";
+const NPC_GROUPS_KEY = "ArkadiaQuestNPCGroups";
 
 const SEED_DEFAULT_ID = "__default__";
 const SEED_AMBIANT_ID = "__ambiant__";
@@ -20,6 +21,7 @@ function seedCharacters(): Character[] {
       x: 0, y: 0, z: 0,
       otherInfo: [],
       yamlConfig: DEFAULT_YAML_CONFIG,
+      groupId: SYSTEM_NPC_GROUP_ID,
     },
     {
       id: SEED_AMBIANT_ID,
@@ -32,7 +34,14 @@ function seedCharacters(): Character[] {
       x: 0, y: 0, z: 0,
       otherInfo: [],
       yamlConfig: AMBIANT_YAML_CONFIG,
+      groupId: SYSTEM_NPC_GROUP_ID,
     },
+  ];
+}
+
+function seedNpcGroups(): NpcGroup[] {
+  return [
+    { id: SYSTEM_NPC_GROUP_ID, name: "system", color: GROUP_COLORS[0].value },
   ];
 }
 
@@ -40,7 +49,6 @@ function loadCharacters(): Character[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     let chars: any[] = raw ? JSON.parse(raw) : [];
-    // Migrate old characters
     chars = chars.map((c) => ({
       ...c,
       npcCode: c.npcCode ?? c.gameName ?? "",
@@ -52,7 +60,6 @@ function loadCharacters(): Character[] {
       otherInfo: Array.isArray(c.otherInfo) ? c.otherInfo : (c.otherInfo ? [c.otherInfo] : []),
       yamlConfig: c.yamlConfig ?? "",
     }));
-    // Ensure seed characters exist
     const seeds = seedCharacters();
     for (const seed of seeds) {
       if (!chars.find((c) => c.id === seed.id)) {
@@ -65,12 +72,33 @@ function loadCharacters(): Character[] {
   }
 }
 
+function loadNpcGroups(): NpcGroup[] {
+  try {
+    const raw = localStorage.getItem(NPC_GROUPS_KEY);
+    let groups: NpcGroup[] = raw ? JSON.parse(raw) : [];
+    const seeds = seedNpcGroups();
+    for (const seed of seeds) {
+      if (!groups.find((g) => g.id === seed.id)) {
+        groups.unshift(seed);
+      }
+    }
+    return groups;
+  } catch {
+    return seedNpcGroups();
+  }
+}
+
 export function useCharacters() {
   const [characters, setCharacters] = useState<Character[]>(loadCharacters);
+  const [npcGroups, setNpcGroups] = useState<NpcGroup[]>(loadNpcGroups);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(characters));
   }, [characters]);
+
+  useEffect(() => {
+    localStorage.setItem(NPC_GROUPS_KEY, JSON.stringify(npcGroups));
+  }, [npcGroups]);
 
   const addCharacter = useCallback((char: Character) => {
     setCharacters((prev) => [...prev, char]);
@@ -83,7 +111,6 @@ export function useCharacters() {
   }, []);
 
   const deleteCharacter = useCallback((id: string) => {
-    // Prevent deleting seed characters
     if (id === SEED_DEFAULT_ID || id === SEED_AMBIANT_ID) return;
     setCharacters((prev) => prev.filter((c) => c.id !== id));
   }, []);
@@ -96,5 +123,19 @@ export function useCharacters() {
     return defaultChar?.yamlConfig ?? DEFAULT_YAML_CONFIG;
   }, [characters]);
 
-  return { characters, addCharacter, updateCharacter, deleteCharacter, getEffectiveYaml };
+  const addNpcGroup = useCallback((group: NpcGroup) => {
+    setNpcGroups((prev) => [...prev, group]);
+  }, []);
+  const deleteNpcGroup = useCallback((id: string) => {
+    if (id === SYSTEM_NPC_GROUP_ID) return;
+    setNpcGroups((prev) => prev.filter((g) => g.id !== id));
+
+    setCharacters((prev) =>
+      prev.map((c) => c.groupId === id ? { ...c, groupId: SYSTEM_NPC_GROUP_ID } : c)
+    );
+  }, []);
+  return {
+    characters, addCharacter, updateCharacter, deleteCharacter, getEffectiveYaml,
+    npcGroups, addNpcGroup, deleteNpcGroup,
+  };
 }

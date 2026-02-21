@@ -13,7 +13,15 @@ export interface Character {
   z: number;
   otherInfo: string[];
   yamlConfig: string;
+  groupId: string;
 }
+
+export interface NpcGroup {
+  id: string;
+  name: string;
+  color: string;
+}
+export const SYSTEM_NPC_GROUP_ID = "__system__";
 
 export const DEFAULT_YAML_CONFIG = `# Default character YAML configuration
 type: default

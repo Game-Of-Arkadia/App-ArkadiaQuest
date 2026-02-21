@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
 import type { Quest, QuestGroup, QuestStep, Dialogue } from "@/types/quest";
 
-const GROUPS_KEY = "quest-designer-groups";
-const QUESTS_KEY = "quest-designer-quests";
+const GROUPS_KEY = "ArkadiaQuestGroups";
+const QUESTS_KEY = "ArkadiaQuestQuests";
 
 function load<T>(key: string, fallback: T[]): T[] {
   try {
