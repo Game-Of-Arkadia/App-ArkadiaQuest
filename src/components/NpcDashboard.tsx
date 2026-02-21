@@ -265,107 +265,100 @@ export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete,
             <ScrollArea className="flex-1">
               <div className="p-4 space-y-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Texture URL</Label>
-                  <div className="flex gap-3 items-start">
-                    <div className="shrink-0 w-[48px] flex flex-col items-center">
-                      {isValidUrl ? (
-                        <NpcFullBodyIcon
-                          textureUrl={editingChar.textureUrl}
-                          size={96}
-                          className="rounded-sm border border-border hover:border-primary transition-colors"
-                          onClick={() => openFullBodyPreview(editingChar.textureUrl)}
+                  {!isSeed(editingChar.id) && (
+                    <div className="space-y-1.5">
+                    <Label className="text-xs">Texture URL</Label>
+                    <div className="flex gap-3 items-start">
+                      <div className="shrink-0 w-[48px] flex flex-col items-center">
+                        {isValidUrl ? (
+                          <NpcFullBodyIcon
+                            textureUrl={editingChar.textureUrl}
+                            size={96}
+                            className="rounded-sm border border-border hover:border-primary transition-colors"
+                            onClick={() => openFullBodyPreview(editingChar.textureUrl)}
+                          />
+                        ) : (
+                          <div className="w-[48px] h-[96px] rounded-sm border border-dashed border-muted-foreground/30 flex items-center justify-center bg-muted/30">
+                            <User className="h-5 w-5 text-muted-foreground/40" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <Input
+                          value={editingChar.textureUrl}
+                          onChange={(e) => {
+                            onUpdate(editingChar.id, { textureUrl: e.target.value });
+                          }}
+                          className="h-8 text-sm"
+                          placeholder="https://…/skin.png"
                         />
-                      ) : (
-                        <div className="w-[48px] h-[96px] rounded-sm border border-dashed border-muted-foreground/30 flex items-center justify-center bg-muted/30">
-                          <User className="h-5 w-5 text-muted-foreground/40" />
-                        </div>
-                      )}
+                        {isValidUrl === false &&  (
+                          <p className="text-[11px] text-destructive flex items-center gap-1">
+                            <AlertCircle className="h-3 w-3" /> Invalid texture URL - could not load image.
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex-1 space-y-1">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">Nom</Label>
                       <Input
-                        value={editingChar.textureUrl}
-                        onChange={(e) => {
-                          onUpdate(editingChar.id, { textureUrl: e.target.value });
-                        }}
+                        value={editingChar.name}
+                        onChange={(e) => onUpdate(editingChar.id, { name: e.target.value })}
                         className="h-8 text-sm"
-                        placeholder="https://…/skin.png"
                       />
-                      {isValidUrl === false &&  (
-                        <p className="text-[11px] text-destructive flex items-center gap-1">
-                          <AlertCircle className="h-3 w-3" /> Invalid texture URL - could not load image.
-                        </p>
-                      )}
                     </div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">Nom</Label>
-                    <Input
-                      value={editingChar.name}
-                      onChange={(e) => onUpdate(editingChar.id, { name: e.target.value })}
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">ID du PNJ</Label>
-                    <Input
-                      value={editingChar.characterId}
-                      onChange={(e) => onUpdate(editingChar.id, { characterId: e.target.value })}
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">Code du PNJ</Label>
-                    <Input
-                      value={editingChar.npcCode}
-                      onChange={(e) => onUpdate(editingChar.id, { npcCode: e.target.value })}
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">Genre</Label>
-                    <Select
-                      value={editingChar.gender}
-                      onValueChange={(v) => onUpdate(editingChar.id, { gender: v as CharacterGender })}
-                    >
-                      <SelectTrigger className={`h-7 text-xs w-28 ${genderBg(editingChar)}`}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="male">Homme</SelectItem>
-                        <SelectItem value="female">Femme</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">ID du PNJ</Label>
+                      <Input
+                        value={editingChar.characterId}
+                        onChange={(e) => onUpdate(editingChar.id, { characterId: e.target.value })}
+                        className="h-8 text-sm"
+                      />
+                    </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Code du PNJ</Label>
+                        <Input
+                          value={editingChar.npcCode}
+                          onChange={(e) => onUpdate(editingChar.id, { npcCode: e.target.value })}
+                          className="h-8 text-sm"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Genre</Label>
+                        <Select
+                          value={editingChar.gender}
+                          onValueChange={(v) => onUpdate(editingChar.id, { gender: v as CharacterGender })}
+                        >
+                          <SelectTrigger className={`h-7 text-xs w-28 ${genderBg(editingChar)}`}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="male">Homme</SelectItem>
+                            <SelectItem value="female">Femme</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
 
-                {/*<div className="space-y-1.5">
-                  <Label className="text-xs">Texture URL</Label>
-                  <div className="flex gap-2 items-center">
-                    <Input
-                      value={editingChar.textureUrl}
-                      onChange={(e) => onUpdate(editingChar.id, { textureUrl: e.target.value })}
-                      className="h-8 text-sm flex-1"
-                      placeholder="https://…/skin.png"
-                    />
-                  </div>
-                </div> */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Coordonnées</Label>
-                  <div className="flex items-start gap-1">
-                    <CoordinatesInput
-                      x={editingChar.x}
-                      y={editingChar.y}
-                      z={editingChar.z}
-                      onChange={(coords) => onUpdate(editingChar.id, coords)}
-                      inputClassName="h-8 text-sm font-mono"
-                      className="flex-1"
-                    />
-                    <TpButton x={editingChar.x} y={editingChar.y} z={editingChar.z} />
-                  </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">Coordonnées</Label>
+                      <div className="flex items-start gap-1">
+                        <CoordinatesInput
+                          x={editingChar.x}
+                          y={editingChar.y}
+                          z={editingChar.z}
+                          onChange={(coords) => onUpdate(editingChar.id, coords)}
+                          inputClassName="h-8 text-sm font-mono"
+                          className="flex-1"
+                        />
+                        <TpButton x={editingChar.x} y={editingChar.y} z={editingChar.z} />
+                      </div>
+                    </div>
+                    </div>
+                  )}
                 <div className="space-y-1.5">
                   <Label className="text-xs">Information Supplémentaire</Label>
                   <div className="space-y-1">
