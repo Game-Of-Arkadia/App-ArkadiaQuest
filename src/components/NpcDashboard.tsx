@@ -51,6 +51,11 @@ export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete,
   const [groupModalOpen, setGroupModalOpen] = useState(false);
   const editingChar = characters.find((c) => c.id === editingId) ?? null;
   const filteredCharacters = characters.filter((c) => c.groupId === selectedGroupId);
+  const genderBg = (c: Character) => {
+    if (c.gender === "male") return "bg-blue-100 text-blue-800";
+    if (c.gender === "female") return "bg-pink-100 text-pink-800";
+    return "bg-muted";
+  };
   const openFullBodyPreview = (url: string) => {
     if (!url) return;
     setPreviewTextureUrl(url);
@@ -194,7 +199,7 @@ export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete,
                       value={c.gender}
                       onValueChange={(v) => onUpdate(c.id, { gender: v as CharacterGender })}
                     >
-                      <SelectTrigger className="h-7 text-xs w-28">
+                      <SelectTrigger className={`h-7 text-xs w-28 ${genderBg(c)}`}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -326,7 +331,7 @@ export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete,
                       value={editingChar.gender}
                       onValueChange={(v) => onUpdate(editingChar.id, { gender: v as CharacterGender })}
                     >
-                      <SelectTrigger className="h-8 text-sm w-full">
+                      <SelectTrigger className={`h-7 text-xs w-28 ${genderBg(editingChar)}`}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
