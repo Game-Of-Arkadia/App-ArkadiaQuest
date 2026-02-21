@@ -43,16 +43,9 @@ export function QuestDashboard({ groups, quests, onCreateQuest, onDeleteQuest, o
               const groupQuests = quests.filter((q) => q.groupId === group.id);
               return (
                 <div key={group.id} className="rounded-lg border overflow-hidden">
-                  {/* Group header */}
-                  <div
-                    className="flex items-center justify-between px-3 py-2"
-                    style={{ backgroundColor: group.color + "1a" }}
-                  >
+                  <div className="flex items-center justify-between px-3 py-2">
                     <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full shrink-0"
-                        style={{ backgroundColor: group.color }}
-                      />
+                      <div className="w-3 h-3 rounded-full shrink-0"/>
                       <span className="text-sm font-semibold">{group.name}</span>
                     </div>
                     <Button
@@ -64,7 +57,6 @@ export function QuestDashboard({ groups, quests, onCreateQuest, onDeleteQuest, o
                       <Plus className="h-3 w-3 mr-1" /> Ajouter une quête
                     </Button>
                   </div>
-                  {/* Quests table */}
                   <Table>
                     <TableHeader>
                       <TableRow>

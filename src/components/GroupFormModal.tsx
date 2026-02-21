@@ -35,7 +35,7 @@ export function GroupFormModal({ open, onOpenChange, onSubmit }: GroupFormModalP
                 <div className="space-y-4 py-2">
                     <div className="space-y-1.5">
                         <Label className="text-xs">
-                            Nom du groupe <span className="text-destructive">*</span>
+                            Nom du groupe
                         </Label>
                         <Input
                             placeholder="e.g. Riddermark"
@@ -45,18 +45,6 @@ export function GroupFormModal({ open, onOpenChange, onSubmit }: GroupFormModalP
                             autoFocus
                             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                         />
-                    </div>
-                    <div className="space-y-1.5">
-                        <Label className="text-xs">Couleur</Label>
-                        <div className="flex gap-2 items-center">
-                            <input
-                                type="color"
-                                value={color}
-                                onChange={(e) => setColor(e.target.value)}
-                                className="w-10 h-8 rounded cursor-pointer"
-                            />
-                            <span className="text-sm text-muted-foreground">{color}</span>
-                        </div>
                     </div>
                 </div>
                 <Button size="sm" onClick={handleSubmit} disabled={!name.trim()}>
