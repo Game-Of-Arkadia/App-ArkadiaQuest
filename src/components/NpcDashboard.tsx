@@ -404,6 +404,23 @@ export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete,
                     placeholder="/assets/character.png"
                   />
                 </div>
+                {!isSeed(editingChar.id) && (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Group</Label>
+                    <Select value={editingChar.groupId} onValueChange={(v) => onUpdate(editingChar.id, { groupId: v })}>
+                      <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {npcGroups.map((g) => (
+                          <SelectItem key={g.id} value={g.id}>
+                            <span className="flex items-center gap-2">
+                              {g.name}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
                 <div className="space-y-1.5">
                   <Label className="text-xs">
