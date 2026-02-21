@@ -22,18 +22,89 @@ export interface NpcGroup {
 }
 export const SYSTEM_NPC_GROUP_ID = "__system__";
 
-export const DEFAULT_YAML_CONFIG = `# Default character YAML configuration
-type: default
-behavior:
-  idle: true
-  interact: true`;
+export const DEFAULT_YAML_CONFIG = `Settings:
+  typing-speed: 1 # Ticks(Second/20)
+  range: 3
+  effect: Freeze # Slowness / Freeze
+  answer-numbers: false
+  prevent-exit: false
+  character-name: true
+  character-image: false
+  background-fog: true
+Sounds:
+  typing: luxdialogues:luxdialogues.sounds.typing
+  selection: luxdialogues:luxdialogues.sounds.selection
+Offsets:
+  name: 20
+  dialogue-background: 0
+  dialogue-line: 10
+  answer-background: 90
+  answer-line: 8
+  arrow: -7
+  character: -16
+Character:
+  name:  Default
+Images:
+  character: tavernier-avatar
+  arrow: hand
+  dialogue-background: dialogue-background
+  answer-background: answer-background-large
+  name-start: name-start
+  name-mid: name-mid
+  name-end: name-end
+  fog: fog
+Colors:
+  name: '#4f4a3e'
+  name-background: '#f8ffe0'
+  dialogue: '#4f4a3e'
+  dialogue-background: '#f8ffe0'
+  answer: '#4f4a3e'
+  answer-background: '#f8ffe0'
+  arrow: '#cdff29'
+  selected: '#4f4a3e'
+  fog: '#000000'`;
 
-export const AMBIANT_YAML_CONFIG = `# Ambiant character YAML configuration
-type: ambiant
-behavior:
-  idle: true
-  interact: false
-  ambient: true`;
+export const AMBIANT_YAML_CONFIG = `Settings:
+  typing-speed: 1 # Ticks(Second/20)
+  range: 3
+  effect: Freeze # Slowness / Freeze
+  answer-numbers: false
+  prevent-exit: false
+  character-name: false
+  character-image: false
+  background-fog: true
+Sounds:
+  typing: luxdialogues:luxdialogues.sounds.typing
+  selection: luxdialogues:luxdialogues.sounds.selection
+Offsets:
+  name: 20
+  dialogue-background: 0
+  dialogue-line: 10
+  answer-background: 90
+  answer-line: 8
+  arrow: -7
+  character: -16
+Character:
+  name: Ambiant
+Images:
+  character: tavernier-avatar
+  arrow: hand
+  dialogue-background: dialogue-background
+  answer-background: answer-background
+  name-start: name-start
+  name-mid: name-mid
+  name-end: name-end
+  fog: fog
+Colors:
+  name: '#4f4a3e'
+  name-background: '#f8ffe0'
+  dialogue: '#4f4a3e'
+  dialogue-background: '#f8ffe0'
+  answer: '#4f4a3e'
+  answer-background: '#f8ffe0'
+  arrow: '#cdff29'
+  selected: '#4f4a3e'
+  fog: '#000000'`;
 
 export interface Dialogue {
   id: string;
