@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import type { Character, NpcGroup } from "@/types/quest";
-import { DEFAULT_YAML_CONFIG, AMBIANT_YAML_CONFIG, SYSTEM_NPC_GROUP_ID, GROUP_COLORS } from "@/types/quest";
+import { DEFAULT_YAML_CONFIG, AMBIANT_YAML_CONFIG, SYSTEM_NPC_GROUP_ID } from "@/types/quest";
 
 const STORAGE_KEY = "ArkadiaQuestNPCs";
 const NPC_GROUPS_KEY = "ArkadiaQuestNPCGroups";
@@ -41,7 +41,7 @@ function seedCharacters(): Character[] {
 
 function seedNpcGroups(): NpcGroup[] {
   return [
-    { id: SYSTEM_NPC_GROUP_ID, name: "system", color: GROUP_COLORS[0].value },
+    { id: SYSTEM_NPC_GROUP_ID, name: "system" }
   ];
 }
 

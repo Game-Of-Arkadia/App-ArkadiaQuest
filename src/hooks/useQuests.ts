@@ -35,7 +35,7 @@ function migrateQuest(q: Quest): Quest {
 
 export function useQuests() {
   const [groups, setGroups] = useState<QuestGroup[]>(() =>
-    load<QuestGroup>(GROUPS_KEY, []).map((g) => ({ ...g, color: g.color || "hsl(0 0% 50%)" }))
+    load<QuestGroup>(GROUPS_KEY, []).map((g) => ({ id: g.id, name: g.name }))
   );
   const [quests, setQuests] = useState<Quest[]>(() => load<Quest>(QUESTS_KEY, []).map(migrateQuest));
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { QuestDashboard } from "@/components/QuestDashboard";
 import type { AppSection } from "@/components/AppHeader";
-import { QuestFormModal } from "@/components/QuestFormModal";
 import { LoginScreen } from "@/components/LoginScreen";
 import { GroupFormModal } from "@/components/GroupFormModal";
 import { NpcDashboard } from "@/components/NpcDashboard";
@@ -89,20 +88,10 @@ const Index = () => {
         </div>
       )}
 
-      <QuestFormModal
-        open={questModalOpen}
-        onOpenChange={setQuestModalOpen}
-        quests={quests}
-        characters={characters}
-        groups={groups}
-        groupId={questModalGroupId}
-        onSubmit={handleQuestFormSubmit}
-      />
-
       <GroupFormModal
         open={groupModalOpen}
         onOpenChange={setGroupModalOpen}
-        onSubmit={({ name, color }) => addGroup({ id: crypto.randomUUID(), name, color })}
+        onSubmit={({ name }) => addGroup({ id: crypto.randomUUID(), name })}
       />
     </div>
   );

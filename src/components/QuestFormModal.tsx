@@ -148,10 +148,6 @@ export function QuestFormModal({
                 {groups.map((g) => (
                   <SelectItem key={g.id} value={g.id}>
                     <div className="flex items-center gap-2">
-                      <div
-                        className="w-2.5 h-2.5 rounded-full shrink-0"
-                        style={{ backgroundColor: g.color }}
-                      />
                       {g.name}
                     </div>
                   </SelectItem>

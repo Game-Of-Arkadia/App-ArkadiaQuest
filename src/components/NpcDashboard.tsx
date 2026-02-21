@@ -468,7 +468,7 @@ export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete,
       <GroupFormModal
         open={groupModalOpen}
         onOpenChange={setGroupModalOpen}
-        onSubmit={({ name, color }) => onAddGroup({ id: crypto.randomUUID(), name, color })}
+        onSubmit={({ name }) => onAddGroup({ id: crypto.randomUUID(), name })}
       />
     </div>
   );
