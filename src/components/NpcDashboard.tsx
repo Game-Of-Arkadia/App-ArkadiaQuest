@@ -438,7 +438,7 @@ export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete,
                     onChange={(e) => onUpdate(editingChar.id, { yamlConfig: e.target.value })}
                     className={!isSeed(editingChar.id)
                         ? "min-h-[80px] max-h-[800px] font-mono text-xs resize-y"
-                        : "min-h-[637px] max-h-[800px] font-mono text-xs resize-y"}
+                        : "min-h-[500px] max-h-[800px] font-mono text-xs resize-y"}
                     placeholder={isSeed(editingChar.id) ? "# YAML config…" : "# Leave empty to inherit default config…"}
                   />
                 </div>
