@@ -32,6 +32,7 @@ export const STEP_REGISTRY: Record<StepType, StepTypeConfig> = {
     borderColor: "hsl(var(--primary))",
     bgColor: "hsl(var(--primary) / 0.03)",
     hasDialogues: true,
+    isInteraction: true,
     component: (props) => <TalkToCharacterBlock {...props} />,
   },
   character_says: {
@@ -40,6 +41,7 @@ export const STEP_REGISTRY: Record<StepType, StepTypeConfig> = {
     borderColor: "hsl(var(--chart-4, 280 65% 60%))",
     bgColor: "hsl(var(--chart-4, 280 65% 60%) / 0.05)",
     hasDialogues: true,
+    isInteraction: false,
     component: (props) => <CharacterSaysBlock {...props} />,
   },
   go_somewhere: {
@@ -48,6 +50,7 @@ export const STEP_REGISTRY: Record<StepType, StepTypeConfig> = {
     borderColor: "hsl(var(--accent-foreground))",
     bgColor: "hsl(var(--accent) / 0.06)",
     hasDialogues: false,
+    isInteraction: true,
     component: (props) => <GoSomewhereBlock {...props} />,
   },
 };

@@ -158,6 +158,7 @@ export interface QuestStep {
   type: StepType;
   data: StepData;
   dialogues: Dialogue[];
+  interactionDescription?: string;
 }
 
 // Quest status — extensible: add new statuses here
