@@ -72,7 +72,6 @@ const Index = () => {
           onCreateQuest={handleOpenCreateQuest}
           onDeleteQuest={deleteQuest}
           onOpenGroupModal={() => setGroupModalOpen(true)}
-          onDeleteGroup={deleteGroup}
         />
       )}
       {activeSection === "npcs" && (
