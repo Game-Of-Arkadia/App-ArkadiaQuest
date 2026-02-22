@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { STEP_REGISTRY, INSERTABLE_STEP_TYPES } from "@/components/quest-steps/StepRegistry";
+import { StepComments } from "@/components/quest-steps/StepComments";
 import type { Character, Quest, QuestStep, Dialogue, StepType, NpcGroup } from "@/types/quest";
 import { defaultStepData } from "@/types/quest";
 
@@ -127,6 +128,11 @@ export function QuestDocumentEditor({
                       onDeleteDialogue: onDeleteStepDialogue,
                     })}
                   </div>
+                  <StepComments
+                    comments={step.comments || []}
+                    currentUser={currentUser}
+                    onUpdate={(comments) => onUpdateStep(quest.id, step.id, { comments })}
+                  />
                 </div>
               </div>
             );
