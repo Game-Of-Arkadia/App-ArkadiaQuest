@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -17,16 +17,18 @@ interface QuestDocumentEditorProps {
   onDeleteStepDialogue: (questId: string, stepId: string, dialogueId: string) => void;
 }
 
-function InsertEventMenu({ onInsert }: { onInsert: (type: StepType) => void }) {
+function InsertEventMenu({ onInsert, align = "center" }: { onInsert: (type: StepType) => void; align?: "center" | "start" }) {
   const [open, setOpen] = useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="w-5 h-5 rounded-full flex items-center justify-center bg-primary/10 text-primary hover:bg-primary/20 transition-colors opacity-0 group-hover/insert:opacity-100 focus:opacity-100 shrink-0">
+        <button
+          className="w-5 h-5 rounded-full flex items-center justify-center bg-primary/10 text-primary hover:bg-primary/20 transition-colors shrink-0"
+        >
           <Plus className="h-3 w-3" />
         </button>
       </PopoverTrigger>
-      <PopoverContent side="left" align="start" className="w-48 p-1">
+      <PopoverContent side="left" align={align} className="w-48 p-1">
         {INSERTABLE_STEP_TYPES.map(([type, config]) => (
           <button
             key={type}
@@ -42,11 +44,8 @@ function InsertEventMenu({ onInsert }: { onInsert: (type: StepType) => void }) {
   );
 }
 
-export function QuestDocumentEditor({
-  quest, characters,
-  onAddStep, onUpdateStep, onDeleteStep,
-  onAddStepDialogue, onUpdateStepDialogue, onDeleteStepDialogue,
-}: QuestDocumentEditorProps) {
+export function QuestDocumentEditor({quest, characters, onAddStep, onUpdateStep, onDeleteStep, onAddStepDialogue, onUpdateStepDialogue, onDeleteStepDialogue}: QuestDocumentEditorProps) {
+  const [activeGap, setActiveGap] = useState<number | null>(null); // gapIndex 0 = before step[0], gapIndex i = between step[i-1] and step[i], gapIndex steps.length = after last step
   const handleInsert = useCallback(
     (type: StepType, atIndex?: number) => {
       const config = STEP_REGISTRY[type];
@@ -59,14 +58,28 @@ export function QuestDocumentEditor({
           : [],
       };
       onAddStep(quest.id, newStep, atIndex);
+      setActiveGap(null);
     },
     [quest.id, onAddStep]
   );
 
+  const handleBlockMouseMove = (e: React.MouseEvent<HTMLDivElement>, blockIndex: number) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    if (e.clientY < midY) {
+      setActiveGap(blockIndex);
+    } else {
+      setActiveGap(blockIndex + 1);
+    }
+  };
+  const handleContainerMouseLeave = () => {
+    setActiveGap(null);
+  };
+
   return (
     <div className="flex-1 flex flex-col min-h-0">
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-2xl mx-auto py-6 px-4">
+        <div className="max-w-2xl mx-auto py-6 px-4" onMouseLeave={handleContainerMouseLeave}>
           {quest.steps.length === 0 && (
             <div className="text-center py-12 text-muted-foreground/60">
               <p className="text-sm mb-3">Start writing your quest script.</p>
@@ -83,30 +96,36 @@ export function QuestDocumentEditor({
           {quest.steps.map((step, idx) => {
             const config = STEP_REGISTRY[step.type];
             return (
-              <div key={step.id} className="group/insert relative">
-                <div className="absolute -left-7 top-1/2 -translate-y-1/2 z-10">
-                  <InsertEventMenu onInsert={(type) => handleInsert(type, idx)} />
+              <div key={step.id}>
+                {/*dumbass white space */}
+                <div className="flex justify-center items-center h-2 relative">
+                  <div className={`transition-opacity duration-150 ${activeGap === idx ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+                    <InsertEventMenu onInsert={(type) => handleInsert(type, idx)} />
+                  </div>
                 </div>
-                {config.component({
-                  step,
-                  questId: quest.id,
-                  characters,
-                  onUpdateStep,
-                  onDeleteStep,
-                  onAddDialogue: onAddStepDialogue,
-                  onUpdateDialogue: onUpdateStepDialogue,
-                  onDeleteDialogue: onDeleteStepDialogue,
-                })}
+                <div
+                  onMouseMove={(e) => handleBlockMouseMove(e, idx)}
+                >
+                  {config.component({
+                    step,
+                    questId: quest.id,
+                    characters,
+                    onUpdateStep,
+                    onDeleteStep,
+                    onAddDialogue: onAddStepDialogue,
+                    onUpdateDialogue: onUpdateStepDialogue,
+                    onDeleteDialogue: onDeleteStepDialogue,
+                  })}
+                </div>
               </div>
             );
           })}
 
           {quest.steps.length > 0 && (
-            <div className="group/insert relative py-2">
-              <div className="absolute -left-7 top-1/2 -translate-y-1/2 z-10">
+            <div className="flex justify-center items-center h-6 relative">
+              <div className={`transition-opacity duration-150 ${activeGap === quest.steps.length ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
                 <InsertEventMenu onInsert={(type) => handleInsert(type)} />
               </div>
-              <div className="border-t border-dashed border-muted-foreground/20" />
             </div>
           )}
         </div>
