@@ -7,7 +7,7 @@ import type { StepBlockProps } from "./StepRegistry";
 import type { GoSomewhereData } from "@/types/quest";
 
 export function GoSomewhereBlock({
-  step, questId, onUpdateStep, onDeleteStep,
+  step, questId, currentUser, onUpdateStep, onDeleteStep,
 }: StepBlockProps) {
   const data = step.data as GoSomewhereData;
   const config = STEP_REGISTRY[step.type];
@@ -20,6 +20,9 @@ export function GoSomewhereBlock({
       isInteraction={config.isInteraction}
       interactionDescription={step.interactionDescription}
       onInteractionDescriptionChange={(v) => onUpdateStep(questId, step.id, { interactionDescription: v })}
+      comments={step.comments}
+      currentUser={currentUser}
+      onCommentsChange={(comments) => onUpdateStep(questId, step.id, { comments })}
     >
       <div className="flex items-center gap-2 flex-wrap">
         <span className="font-medium text-sm select-none flex items-center gap-1" style={{ color: config.borderColor }}>

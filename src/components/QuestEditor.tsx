@@ -139,6 +139,7 @@ export function QuestEditor({
           quest={quest}
           characters={characters}
           npcGroups={npcGroups}
+          currentUser={currentUser}
           onAddStep={onAddStep}
           onUpdateStep={onUpdateStep}
           onDeleteStep={onDeleteStep}

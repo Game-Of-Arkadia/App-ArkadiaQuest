@@ -10,6 +10,7 @@ interface QuestDocumentEditorProps {
   quest: Quest;
   characters: Character[];
   npcGroups: NpcGroup[];
+  currentUser: string;
   onAddStep: (questId: string, step: QuestStep, atIndex?: number) => void;
   onUpdateStep: (questId: string, stepId: string, updates: Partial<QuestStep>) => void;
   onDeleteStep: (questId: string, stepId: string) => void;
@@ -45,7 +46,11 @@ function InsertEventMenu({ onInsert, align = "center" }: { onInsert: (type: Step
   );
 }
 
-export function QuestDocumentEditor({quest, characters, npcGroups, onAddStep, onUpdateStep, onDeleteStep, onAddStepDialogue, onUpdateStepDialogue, onDeleteStepDialogue}: QuestDocumentEditorProps) {
+export function QuestDocumentEditor({
+  quest, characters, npcGroups, currentUser,
+  onAddStep, onUpdateStep, onDeleteStep,
+  onAddStepDialogue, onUpdateStepDialogue, onDeleteStepDialogue
+}: QuestDocumentEditorProps) {
   const [activeGap, setActiveGap] = useState<number | null>(null); // gapIndex 0 = before step[0], gapIndex i = between step[i-1] and step[i], gapIndex steps.length = after last step
   const handleInsert = useCallback(
     (type: StepType, atIndex?: number) => {
@@ -112,6 +117,7 @@ export function QuestDocumentEditor({quest, characters, npcGroups, onAddStep, on
                     questId: quest.id,
                     characters,
                     npcGroups,
+                    currentUser,
                     onUpdateStep,
                     onDeleteStep,
                     onAddDialogue: onAddStepDialogue,

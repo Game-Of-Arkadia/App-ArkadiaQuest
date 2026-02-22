@@ -8,7 +8,7 @@ import type { StepBlockProps } from "./StepRegistry";
 import type { CharacterSaysData } from "@/types/quest";
 
 export function CharacterSaysBlock({
-  step, questId, characters, npcGroups,
+  step, questId, characters, npcGroups, currentUser,
   onUpdateStep, onDeleteStep,
   onAddDialogue, onUpdateDialogue, onDeleteDialogue,
 }: StepBlockProps) {
@@ -17,9 +17,11 @@ export function CharacterSaysBlock({
 
   const selectedChar = characters.find((c) => c.id === data.characterId);
   const [groupFilter, setGroupFilter] = useState<string>(selectedChar?.groupId || "");
+
   useEffect(() => {
     if (selectedChar) setGroupFilter(selectedChar.groupId);
   }, [selectedChar?.groupId]);
+
   const filteredCharacters = groupFilter
     ? characters.filter((c) => c.groupId === groupFilter)
     : characters;
@@ -42,7 +44,14 @@ export function CharacterSaysBlock({
   };
 
   return (
-    <StepBlockWrapper borderColor={config.borderColor} bgColor={config.bgColor} onDelete={() => onDeleteStep(questId, step.id)}>
+    <StepBlockWrapper
+      borderColor={config.borderColor}
+      bgColor={config.bgColor}
+      onDelete={() => onDeleteStep(questId, step.id)}
+      comments={step.comments}
+      currentUser={currentUser}
+      onCommentsChange={(comments) => onUpdateStep(questId, step.id, { comments })}
+    >
       <div className="flex items-center gap-1.5 flex-wrap">
         <span className="font-medium text-sm select-none" style={{ color: config.borderColor }}>→</span>
         <Select value={data.characterId || ""} onValueChange={(v) => onUpdateStep(questId, step.id, { data: { ...data, characterId: v } })}>

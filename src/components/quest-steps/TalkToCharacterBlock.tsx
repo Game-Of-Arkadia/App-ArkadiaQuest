@@ -8,7 +8,7 @@ import type { StepBlockProps } from "./StepRegistry";
 import type { TalkToCharacterData } from "@/types/quest";
 
 export function TalkToCharacterBlock({
-  step, questId, characters, npcGroups,
+  step, questId, characters, npcGroups, currentUser,
   onUpdateStep, onDeleteStep,
   onAddDialogue, onUpdateDialogue, onDeleteDialogue,
 }: StepBlockProps) {
@@ -17,9 +17,11 @@ export function TalkToCharacterBlock({
 
   const selectedChar = characters.find((c) => c.id === data.characterId);
   const [groupFilter, setGroupFilter] = useState<string>(selectedChar?.groupId || "");
+
   useEffect(() => {
     if (selectedChar) setGroupFilter(selectedChar.groupId);
   }, [selectedChar?.groupId]);
+
   const filteredCharacters = groupFilter
     ? characters.filter((c) => c.groupId === groupFilter)
     : characters;
@@ -49,6 +51,9 @@ export function TalkToCharacterBlock({
       isInteraction={config.isInteraction}
       interactionDescription={step.interactionDescription}
       onInteractionDescriptionChange={(v) => onUpdateStep(questId, step.id, { interactionDescription: v })}
+      comments={step.comments}
+      currentUser={currentUser}
+      onCommentsChange={(comments) => onUpdateStep(questId, step.id, { comments })}
     >
       <div className="flex items-center gap-1.5 flex-wrap">
         <span className="font-medium text-sm select-none" style={{ color: config.borderColor }}>→ Parler à</span>

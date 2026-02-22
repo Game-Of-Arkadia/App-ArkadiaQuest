@@ -136,6 +136,14 @@ export function defaultRequirementData(type: RequirementType): QuestRequirement 
 // Step types — extensible: add new type strings + matching data interfaces
 export type StepType = "go_somewhere" | "talk_to_character" | "character_says";
 
+export interface StepComment {
+  id: string;
+  content: string;
+  author: string;
+  createdAt: string;
+  replies: StepComment[];
+}
+
 export interface GoSomewhereData {
   x: number;
   y: number;
@@ -159,6 +167,7 @@ export interface QuestStep {
   data: StepData;
   dialogues: Dialogue[];
   interactionDescription?: string;
+  comments?: StepComment[];
 }
 
 // Quest status — extensible: add new statuses here
