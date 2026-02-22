@@ -9,6 +9,7 @@ export interface StepBlockProps {
   step: QuestStep;
   questId: string;
   characters: Character[];
+  npcGroups: import("@/types/quest").NpcGroup[];
   onUpdateStep: (questId: string, stepId: string, updates: Partial<QuestStep>) => void;
   onDeleteStep: (questId: string, stepId: string) => void;
   onAddDialogue: (questId: string, stepId: string, dialogue: Dialogue) => void;

@@ -9,12 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { QuestDocumentEditor } from "@/components/QuestDocumentEditor";
-import type { Character, Quest, QuestStep, Dialogue, StepType, QuestNote, QuestStatus } from "@/types/quest";
+import type { Character, Quest, QuestStep, Dialogue, StepType, QuestNote, QuestStatus, NpcGroup } from "@/types/quest";
 import { QUEST_STATUS_LABELS, QUEST_STATUSES } from "@/types/quest";
 
 interface QuestEditorProps {
   quest: Quest | null;
   characters: Character[];
+  npcGroups: NpcGroup[];
   quests: Quest[];
   users: string[];
   currentUser: string;
@@ -40,6 +41,7 @@ const STATUS_COLORS: Record<QuestStatus, string> = {
 export function QuestEditor({
   quest,
   characters,
+  npcGroups,
   quests,
   users,
   currentUser,
@@ -136,6 +138,7 @@ export function QuestEditor({
         <QuestDocumentEditor
           quest={quest}
           characters={characters}
+          npcGroups={npcGroups}
           onAddStep={onAddStep}
           onUpdateStep={onUpdateStep}
           onDeleteStep={onDeleteStep}

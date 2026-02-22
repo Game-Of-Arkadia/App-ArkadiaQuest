@@ -3,12 +3,13 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { STEP_REGISTRY, INSERTABLE_STEP_TYPES } from "@/components/quest-steps/StepRegistry";
-import type { Character, Quest, QuestStep, Dialogue, StepType } from "@/types/quest";
+import type { Character, Quest, QuestStep, Dialogue, StepType, NpcGroup } from "@/types/quest";
 import { defaultStepData } from "@/types/quest";
 
 interface QuestDocumentEditorProps {
   quest: Quest;
   characters: Character[];
+  npcGroups: NpcGroup[];
   onAddStep: (questId: string, step: QuestStep, atIndex?: number) => void;
   onUpdateStep: (questId: string, stepId: string, updates: Partial<QuestStep>) => void;
   onDeleteStep: (questId: string, stepId: string) => void;
@@ -44,7 +45,7 @@ function InsertEventMenu({ onInsert, align = "center" }: { onInsert: (type: Step
   );
 }
 
-export function QuestDocumentEditor({quest, characters, onAddStep, onUpdateStep, onDeleteStep, onAddStepDialogue, onUpdateStepDialogue, onDeleteStepDialogue}: QuestDocumentEditorProps) {
+export function QuestDocumentEditor({quest, characters, npcGroups, onAddStep, onUpdateStep, onDeleteStep, onAddStepDialogue, onUpdateStepDialogue, onDeleteStepDialogue}: QuestDocumentEditorProps) {
   const [activeGap, setActiveGap] = useState<number | null>(null); // gapIndex 0 = before step[0], gapIndex i = between step[i-1] and step[i], gapIndex steps.length = after last step
   const handleInsert = useCallback(
     (type: StepType, atIndex?: number) => {
@@ -110,6 +111,7 @@ export function QuestDocumentEditor({quest, characters, onAddStep, onUpdateStep,
                     step,
                     questId: quest.id,
                     characters,
+                    npcGroups,
                     onUpdateStep,
                     onDeleteStep,
                     onAddDialogue: onAddStepDialogue,
