@@ -31,7 +31,7 @@ export function StepBlockWrapper({borderColor, bgColor, onDelete, isInteraction,
       </Button>
       {isInteraction && (
         <div className="mb-2">
-          <label className="text-[10px] font-medium text-muted-foreground select-none">Interaction Description</label>
+          <label className="text-[10px] font-medium text-muted-foreground select-none">Objectif joueur:</label>
           <Input
             value={interactionDescription ?? ""}
             onChange={(e) => onInteractionDescriptionChange?.(e.target.value)}
