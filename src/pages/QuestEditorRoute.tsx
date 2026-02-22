@@ -10,11 +10,12 @@ import { LoginScreen } from "@/components/LoginScreen";
 import { useCharacters } from "@/hooks/useCharacters";
 import { useQuests } from "@/hooks/useQuests";
 import { useUser } from "@/hooks/useUser";
+
 export default function QuestEditorRoute() {
   const { questId } = useParams<{ questId: string }>();
   const navigate = useNavigate();
   const { currentUser, users, login, logout } = useUser();
-  const { characters } = useCharacters();
+  const { characters, npcGroups } = useCharacters();
   const {
     groups,
     quests,
@@ -54,6 +55,7 @@ export default function QuestEditorRoute() {
         <QuestEditor
           quest={quest}
           characters={characters}
+          npcGroups={npcGroups}
           quests={quests}
           users={users}
           currentUser={currentUser}

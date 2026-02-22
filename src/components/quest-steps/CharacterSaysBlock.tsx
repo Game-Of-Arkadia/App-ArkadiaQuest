@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DialogueLine } from "./DialogueLine";
@@ -16,25 +16,13 @@ export function CharacterSaysBlock({
   const config = STEP_REGISTRY[step.type];
 
   const selectedChar = characters.find((c) => c.id === data.characterId);
-  const [filterGroupId, setFilterGroupId] = useState<string>(selectedChar?.groupId ?? "");
-  const filteredCharacters = useMemo(() => {
-    if (!filterGroupId) return characters;
-    return characters.filter((c) => c.groupId === filterGroupId);
-  }, [characters, filterGroupId]);
-  const handleCharacterChange = (charId: string) => {
-    onUpdateStep(questId, step.id, { data: { ...data, characterId: charId } });
-    const char = characters.find((c) => c.id === charId);
-    if (char) setFilterGroupId(char.groupId);
-  };
-  const handleGroupChange = (groupId: string) => {
-    setFilterGroupId(groupId === "__all__" ? "" : groupId);
-    if (groupId !== "__all__" && data.characterId) {
-      const char = characters.find((c) => c.id === data.characterId);
-      if (char && char.groupId !== groupId) {
-        onUpdateStep(questId, step.id, { data: { ...data, characterId: "" } });
-      }
-    }
-  };
+  const [groupFilter, setGroupFilter] = useState<string>(selectedChar?.groupId || "");
+  useEffect(() => {
+    if (selectedChar) setGroupFilter(selectedChar.groupId);
+  }, [selectedChar?.groupId]);
+  const filteredCharacters = groupFilter
+    ? characters.filter((c) => c.groupId === groupFilter)
+    : characters;
 
   const handleAddLine = () => {
     onAddDialogue(questId, step.id, {
@@ -54,25 +42,21 @@ export function CharacterSaysBlock({
   };
 
   return (
-    <StepBlockWrapper
-      borderColor={config.borderColor}
-      bgColor={config.bgColor}
-      onDelete={() => onDeleteStep(questId, step.id)}
-    >
+    <StepBlockWrapper borderColor={config.borderColor} bgColor={config.bgColor} onDelete={() => onDeleteStep(questId, step.id)}>
       <div className="flex items-center gap-1.5 flex-wrap">
         <span className="font-medium text-sm select-none" style={{ color: config.borderColor }}>→</span>
-        <Select value={data.characterId || ""} onValueChange={handleCharacterChange}>
+        <Select value={data.characterId || ""} onValueChange={(v) => onUpdateStep(questId, step.id, { data: { ...data, characterId: v } })}>
           <SelectTrigger className="h-6 text-xs w-36 border-dashed bg-background/60"><SelectValue placeholder="" /></SelectTrigger>
           <SelectContent>
             {filteredCharacters.map((c) => <SelectItem key={c.id} value={c.id}>{c.name} ({c.npcCode})</SelectItem>)}
           </SelectContent>
         </Select>
-        <span className="text-xs text-muted-foreground select-none">from</span>
-        <Select value={filterGroupId || "__all__"} onValueChange={handleGroupChange}>
-          <SelectTrigger className="h-6 text-xs w-28 border-dashed bg-background/60"><SelectValue /></SelectTrigger>
+        <span className="font-medium text-sm select-none" style={{ color: config.borderColor }}>de</span>
+        <Select value={groupFilter} onValueChange={(v) => setGroupFilter(v === "__all__" ? "" : v)}>
+          <SelectTrigger className="h-6 text-xs w-32 border-dashed bg-background/60"><SelectValue  /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">All Groups</SelectItem>
-            {npcGroups.map((g) => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
+            <SelectItem value="__all__">All</SelectItem>
+            {(npcGroups || []).map((g) => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
           </SelectContent>
         </Select>
         <span className="font-medium text-sm select-none" style={{ color: config.borderColor }}>dit:</span>

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { StepType, Character, QuestStep, Dialogue } from "@/types/quest";
+import type { StepType, Character, QuestStep, Dialogue, NpcGroup } from "@/types/quest";
 import { MapPin, MessageCircle, MessageSquareQuote } from "lucide-react";
 import { TalkToCharacterBlock } from "./TalkToCharacterBlock";
 import { GoSomewhereBlock } from "./GoSomewhereBlock";
@@ -9,7 +9,7 @@ export interface StepBlockProps {
   step: QuestStep;
   questId: string;
   characters: Character[];
-  npcGroups: import("@/types/quest").NpcGroup[];
+  npcGroups: NpcGroup[];
   onUpdateStep: (questId: string, stepId: string, updates: Partial<QuestStep>) => void;
   onDeleteStep: (questId: string, stepId: string) => void;
   onAddDialogue: (questId: string, stepId: string, dialogue: Dialogue) => void;
