@@ -32,7 +32,14 @@ export function TalkToCharacterBlock({
   };
 
   return (
-    <StepBlockWrapper borderColor={config.borderColor} bgColor={config.bgColor} onDelete={() => onDeleteStep(questId, step.id)}>
+    <StepBlockWrapper
+      borderColor={config.borderColor}
+      bgColor={config.bgColor}
+      onDelete={() => onDeleteStep(questId, step.id)}
+      isInteraction={config.isInteraction}
+      interactionDescription={step.interactionDescription}
+      onInteractionDescriptionChange={(v) => onUpdateStep(questId, step.id, { interactionDescription: v })}
+    >
       <div className="flex items-center gap-1.5 flex-wrap">
         <span className="font-medium text-sm select-none" style={{ color: config.borderColor }}>→ Parler à</span>
         <Select value={data.characterId || ""} onValueChange={(v) => onUpdateStep(questId, step.id, { data: { ...data, characterId: v } })}>

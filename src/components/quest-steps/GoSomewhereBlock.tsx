@@ -13,7 +13,14 @@ export function GoSomewhereBlock({
   const config = STEP_REGISTRY[step.type];
 
   return (
-    <StepBlockWrapper borderColor={config.borderColor} bgColor={config.bgColor} onDelete={() => onDeleteStep(questId, step.id)}>
+    <StepBlockWrapper
+      borderColor={config.borderColor}
+      bgColor={config.bgColor}
+      onDelete={() => onDeleteStep(questId, step.id)}
+      isInteraction={config.isInteraction}
+      interactionDescription={step.interactionDescription}
+      onInteractionDescriptionChange={(v) => onUpdateStep(questId, step.id, { interactionDescription: v })}
+    >
       <div className="flex items-center gap-2 flex-wrap">
         <span className="font-medium text-sm select-none flex items-center gap-1" style={{ color: config.borderColor }}>
           <MapPin className="h-3.5 w-3.5" /> → Se rendre à
