@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -109,21 +109,24 @@ export function QuestDocumentEditor({
                     <InsertEventMenu onInsert={(type) => handleInsert(type, idx)} />
                   </div>
                 </div>
-                <div
-                  onMouseMove={(e) => handleBlockMouseMove(e, idx)}
-                >
-                  {config.component({
-                    step,
-                    questId: quest.id,
-                    characters,
-                    npcGroups,
-                    currentUser,
-                    onUpdateStep,
-                    onDeleteStep,
-                    onAddDialogue: onAddStepDialogue,
-                    onUpdateDialogue: onUpdateStepDialogue,
-                    onDeleteDialogue: onDeleteStepDialogue,
-                  })}
+               <div className="flex items-start gap-3">
+                  <div
+                    className="flex-1 min-w-0"
+                    onMouseMove={(e) => handleBlockMouseMove(e, idx)}
+                  >
+                    {config.component({
+                      step,
+                      questId: quest.id,
+                      characters,
+                      npcGroups,
+                      currentUser,
+                      onUpdateStep,
+                      onDeleteStep,
+                      onAddDialogue: onAddStepDialogue,
+                      onUpdateDialogue: onUpdateStepDialogue,
+                      onDeleteDialogue: onDeleteStepDialogue,
+                    })}
+                  </div>
                 </div>
               </div>
             );

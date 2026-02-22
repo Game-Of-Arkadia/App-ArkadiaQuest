@@ -3,8 +3,6 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { StepComments } from "./StepComments";
-import type { StepComment } from "@/types/quest";
 
 interface StepBlockWrapperProps {
   borderColor: string;
@@ -13,16 +11,12 @@ interface StepBlockWrapperProps {
   isInteraction?: boolean;
   interactionDescription?: string;
   onInteractionDescriptionChange?: (value: string) => void;
-  comments?: StepComment[];
-  currentUser?: string;
-  onCommentsChange?: (comments: StepComment[]) => void;
   children: ReactNode;
 }
 
 export function StepBlockWrapper({
   borderColor, bgColor,
   onDelete, isInteraction, interactionDescription, onInteractionDescriptionChange,
-  comments = [], currentUser = "", onCommentsChange,
   children
 }: StepBlockWrapperProps) {
   const descEmpty = isInteraction && (!interactionDescription || interactionDescription.trim() === "");
@@ -55,9 +49,6 @@ export function StepBlockWrapper({
       )}
       {children}
 
-      {currentUser && onCommentsChange && (
-        <StepComments comments={comments} currentUser={currentUser} onUpdate={onCommentsChange} />
-      )}
     </div>
   );
 }

@@ -48,9 +48,6 @@ export function CharacterSaysBlock({
       borderColor={config.borderColor}
       bgColor={config.bgColor}
       onDelete={() => onDeleteStep(questId, step.id)}
-      comments={step.comments}
-      currentUser={currentUser}
-      onCommentsChange={(comments) => onUpdateStep(questId, step.id, { comments })}
     >
       <div className="flex items-center gap-1.5 flex-wrap">
         <span className="font-medium text-sm select-none" style={{ color: config.borderColor }}>→</span>
