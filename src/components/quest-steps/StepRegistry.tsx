@@ -22,6 +22,7 @@ export interface StepTypeConfig {
   borderColor: string;
   bgColor: string;
   hasDialogues: boolean;
+  isInteraction: boolean;
   component: (props: StepBlockProps) => ReactNode;
 }
 
