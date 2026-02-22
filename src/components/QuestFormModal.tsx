@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Character, Quest, QuestGroup, QuestRequirement, RequirementType } from "@/types/quest";
 import { REQUIREMENT_TYPE_LABELS, defaultRequirementData } from "@/types/quest";
+import { Separator } from "@radix-ui/react-separator";
 
 interface QuestFormModalProps {
   open: boolean;
@@ -113,18 +114,7 @@ export function QuestFormModal({
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-xs">
-                Nom <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                placeholder="Nom de la quête…"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="h-8 text-sm"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">
-                ID <span className="text-destructive">*</span>
+                ID
               </Label>
               <Input
                 placeholder="unique_quest_id"
@@ -134,11 +124,31 @@ export function QuestFormModal({
                 disabled={isEditing}
               />
             </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">
+                Nom de quête
+              </Label>
+              <Input
+                placeholder="Nom de la quête…"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="h-8 text-sm"
+              />
+            </div>
           </div>
 
           <div className="space-y-1.5">
+            <Label className="text-xs">Description</Label>
+            <Textarea
+              placeholder="Description de la quête…"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="min-h-[60px] text-sm resize-y"
+            />
+          </div>
+          <div className="space-y-1.5">
             <Label className="text-xs">
-              Group <span className="text-destructive">*</span>
+              Group
             </Label>
             <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
               <SelectTrigger className="h-8 text-sm">
@@ -155,15 +165,7 @@ export function QuestFormModal({
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs">Description</Label>
-            <Textarea
-              placeholder="Description de la quête…"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="min-h-[60px] text-sm resize-y"
-            />
-          </div>
+          <Separator/> 
 
           <div className="space-y-1.5">
             <Label className="text-xs">NPC de départ</Label>
