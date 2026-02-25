@@ -36,10 +36,13 @@ This tool helps our scribes keep all NPCs stored in one centralized place. Addit
 > [!WARNING]
 > This app is **only** compatible with [BeautyQuest](https://modrinth.com/plugin/beautyquests) using [LuxDialogue](https://builtbybit.com/resources/luxdialogues-interactive-dialogues.60954/) plugins.
 
+---
 
 ## 🛠️ Usage
 
 ### Installation
+
+Install and launch dev environment using :
 ```bash
 git clone https://github.com/Game-Of-Arkadia/App-ArkadiaQues
 cd ArkadiaQuest
@@ -48,4 +51,15 @@ npm run dev
 ```
 *Access the app at `http://localhost:8080`.*
 
+To be able to send requests for the NPCs skin, launch the backend by running :
+```
+npm run server
+```
 
+## 💬 Support
+
+If you have any questions, suggestions, or need assistance, please open an issue.
+
+---
+
+<sub>Made with ❤️ by [Pamplemom](https://github.com/PamplemomM) - Have fun !</sub>
