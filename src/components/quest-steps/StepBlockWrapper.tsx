@@ -39,7 +39,7 @@ export function StepBlockWrapper({
           <Input
             value={interactionDescription ?? ""}
             onChange={(e) => onInteractionDescriptionChange?.(e.target.value)}
-            placeholder="Parler à [x] dans [y] de [z].."
+            placeholder="Parler à [PNJ] dans [Ville].."
             className={cn(
               "h-7 text-xs mt-0.5",
               descEmpty && "bg-destructive/15 border-destructive/30 placeholder:text-destructive/40"
