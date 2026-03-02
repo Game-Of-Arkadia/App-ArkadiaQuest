@@ -47,6 +47,33 @@ function InsertEventMenu({ onInsert, align = "center" }: { onInsert: (type: Step
   );
 }
 
+function StepGap({visible, onInsert, onHover}: {
+  visible: boolean;
+  onInsert: (type: StepType) => void;
+  onHover: () => void;
+}) {
+  return (
+    <div
+      className="relative flex items-center justify-center h-6 -my-1 group"
+      onMouseEnter={onHover}
+    >
+      {/* Separator line */}
+      <div className="absolute inset-0 flex justify-center items-center px-3">
+        <div className="w-1/2 border-t border-border/40 group-hover:border-border transition-colors" />
+      </div>
+
+      {/* Center + button */}
+      <div
+        className={`relative z-10 transition-opacity duration-150 ${
+          visible ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <InsertEventMenu onInsert={onInsert} />
+      </div>
+    </div>
+  );
+}
+
 export function QuestDocumentEditor({
   quest, characters, npcGroups, currentUser,
   onAddStep, onUpdateStep, onDeleteStep,
@@ -70,15 +97,6 @@ export function QuestDocumentEditor({
     [quest.id, onAddStep]
   );
 
-  const handleBlockMouseMove = (e: React.MouseEvent<HTMLDivElement>, blockIndex: number) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const midY = rect.top + rect.height / 2;
-    if (e.clientY < midY) {
-      setActiveGap(blockIndex);
-    } else {
-      setActiveGap(blockIndex + 1);
-    }
-  };
   const handleContainerMouseLeave = () => {
     setActiveGap(null);
   };
@@ -86,7 +104,7 @@ export function QuestDocumentEditor({
   return (
     <div className="flex-1 flex flex-col min-h-0">
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-2xl mx-auto py-6 px-4" onMouseLeave={handleContainerMouseLeave}>
+        <div className="max-w-3xl mx-auto py-6 px-4" onMouseLeave={handleContainerMouseLeave}>
           {quest.steps.length === 0 && (
             <div className="text-center py-12 text-muted-foreground/60">
               <p className="text-sm mb-3">Start writing your quest script.</p>
@@ -104,17 +122,13 @@ export function QuestDocumentEditor({
             const config = STEP_REGISTRY[step.type];
             return (
               <div key={step.id}>
-                {/*dumbass white space */}
-                <div className="flex justify-center items-center h-2 relative">
-                  <div className={`transition-opacity duration-150 ${activeGap === idx ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-                    <InsertEventMenu onInsert={(type) => handleInsert(type, idx)} />
-                  </div>
-                </div>
-               <div className="flex items-start gap-3">
-                  <div
-                    className="flex-1 min-w-0"
-                    onMouseMove={(e) => handleBlockMouseMove(e, idx)}
-                  >
+                <StepGap
+                  visible={activeGap === idx}
+                  onHover={() => setActiveGap(idx)}
+                  onInsert={(type) => handleInsert(type, idx)}
+                />
+               <div className="relative">
+                  <div>
                     {config.component({
                       step,
                       questId: quest.id,
@@ -128,22 +142,24 @@ export function QuestDocumentEditor({
                       onDeleteDialogue: onDeleteStepDialogue,
                     })}
                   </div>
-                  <StepComments
-                    comments={step.comments || []}
-                    currentUser={currentUser}
-                    onUpdate={(comments) => onUpdateStep(quest.id, step.id, { comments })}
-                  />
+                  <div className="absolute top-0 left-full ml-3">
+                    <StepComments
+                      comments={step.comments || []}
+                      currentUser={currentUser}
+                      onUpdate={(comments) => onUpdateStep(quest.id, step.id, { comments })}
+                    />
+                  </div>
                 </div>
               </div>
             );
           })}
 
           {quest.steps.length > 0 && (
-            <div className="flex justify-center items-center h-6 relative">
-              <div className={`transition-opacity duration-150 ${activeGap === quest.steps.length ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-                <InsertEventMenu onInsert={(type) => handleInsert(type)} />
-              </div>
-            </div>
+            <StepGap
+              visible={activeGap === quest.steps.length}
+              onHover={() => setActiveGap(quest.steps.length)}
+              onInsert={(type) => handleInsert(type)}
+            />
           )}
         </div>
       </div>

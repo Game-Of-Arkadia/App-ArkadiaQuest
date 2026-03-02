@@ -22,7 +22,7 @@ export function StepBlockWrapper({
   const descEmpty = isInteraction && (!interactionDescription || interactionDescription.trim() === "");
   return (
     <div
-      className="group/event relative rounded-r-md py-2 px-3 my-1"
+      className="group/event relative rounded-r-md py-2 px-3 my-2"
       style={{ borderLeft: `2px solid ${borderColor}`, backgroundColor: bgColor }}
     >
       <Button
