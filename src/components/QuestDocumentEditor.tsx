@@ -107,7 +107,9 @@ export function QuestDocumentEditor({
         <div className="max-w-3xl mx-auto py-6 px-4" onMouseLeave={handleContainerMouseLeave}>
           {quest.steps.length === 0 && (
             <div className="text-center py-12 text-muted-foreground/60">
-              <p className="text-sm mb-3">Start writing your quest script.</p>
+              <p className="text-sm mb-3">
+                Ecrivez votre quête en ajoutant des étapes
+              </p>
               <div className="flex gap-2 justify-center flex-wrap">
                 {INSERTABLE_STEP_TYPES.map(([type, config]) => (
                   <Button key={type} variant="outline" size="sm" className="text-xs gap-1" onClick={() => handleInsert(type)}>

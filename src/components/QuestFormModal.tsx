@@ -121,7 +121,7 @@ export function QuestFormModal({
                 value={questId}
                 onChange={(e) => setQuestId(e.target.value)}
                 className="h-8 text-sm"
-                disabled={isEditing}
+                type="number"
               />
             </div>
             <div className="space-y-1.5">
