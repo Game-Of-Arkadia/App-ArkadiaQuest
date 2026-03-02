@@ -4,6 +4,7 @@ import { QuestDashboard } from "@/components/QuestDashboard";
 import type { AppSection } from "@/components/AppHeader";
 import { LoginScreen } from "@/components/LoginScreen";
 import { GroupFormModal } from "@/components/GroupFormModal";
+import { QuestFormModal } from "@/components/QuestFormModal";
 import { NpcDashboard } from "@/components/NpcDashboard";
 import { useCharacters } from "@/hooks/useCharacters";
 import { useQuests } from "@/hooks/useQuests";
@@ -93,6 +94,18 @@ const Index = () => {
         onOpenChange={setGroupModalOpen}
         onSubmit={({ name }) => addGroup({ id: crypto.randomUUID(), name })}
       />
+
+      {questModalGroupId && (
+        <QuestFormModal
+          open={questModalOpen}
+          onOpenChange={setQuestModalOpen}
+          groupId={questModalGroupId}
+          groups={groups}
+          characters={characters}
+          quests={quests}
+          onSubmit={handleQuestFormSubmit}
+        />
+      )}
     </div>
   );
 };
