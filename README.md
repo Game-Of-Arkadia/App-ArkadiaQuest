@@ -1,7 +1,4 @@
 # App-ArkadiaQuest
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![Status](https://img.shields.io/badge/status-active-success)
-![License](https://img.shields.io/badge/license-MIT-green)
 
 **ArkadiaQuest** is a powerful and intuitive tool that allows anyone to create Arkadia quests with ease.
 
