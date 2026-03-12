@@ -10,6 +10,7 @@ import type { TalkToCharacterData } from "@/types/quest";
 export function TalkToCharacterBlock({
   step, questId, characters, npcGroups, currentUser,
   onUpdateStep, onDeleteStep,
+  onMoveUp, onMoveDown, canMoveUp, canMoveDown,
   onAddDialogue, onUpdateDialogue, onDeleteDialogue,
 }: StepBlockProps) {
   const data = step.data as TalkToCharacterData;
@@ -48,6 +49,10 @@ export function TalkToCharacterBlock({
       borderColor={config.borderColor}
       bgColor={config.bgColor}
       onDelete={() => onDeleteStep(questId, step.id)}
+      onMoveUp={onMoveUp}
+      onMoveDown={onMoveDown}
+      canMoveUp={canMoveUp}
+      canMoveDown={canMoveDown}
       isInteraction={config.isInteraction}
       interactionDescription={step.interactionDescription}
       onInteractionDescriptionChange={(v) => onUpdateStep(questId, step.id, { interactionDescription: v })}

@@ -14,6 +14,7 @@ interface QuestDocumentEditorProps {
   currentUser: string;
   onAddStep: (questId: string, step: QuestStep, atIndex?: number) => void;
   onUpdateStep: (questId: string, stepId: string, updates: Partial<QuestStep>) => void;
+  onMoveStep: (questId: string, stepId: string, direction: "up" | "down") => void;
   onDeleteStep: (questId: string, stepId: string) => void;
   onAddStepDialogue: (questId: string, stepId: string, dialogue: Dialogue) => void;
   onUpdateStepDialogue: (questId: string, stepId: string, dialogueId: string, updates: Partial<Dialogue>) => void;
@@ -76,7 +77,7 @@ function StepGap({visible, onInsert, onHover}: {
 
 export function QuestDocumentEditor({
   quest, characters, npcGroups, currentUser,
-  onAddStep, onUpdateStep, onDeleteStep,
+  onAddStep, onUpdateStep, onDeleteStep, onMoveStep,
   onAddStepDialogue, onUpdateStepDialogue, onDeleteStepDialogue
 }: QuestDocumentEditorProps) {
   const [activeGap, setActiveGap] = useState<number | null>(null); // gapIndex 0 = before step[0], gapIndex i = between step[i-1] and step[i], gapIndex steps.length = after last step
@@ -122,6 +123,8 @@ export function QuestDocumentEditor({
 
           {quest.steps.map((step, idx) => {
             const config = STEP_REGISTRY[step.type];
+            const isFirst = idx === 0;
+            const isLast = idx === quest.steps.length - 1;
             return (
               <div key={step.id}>
                 <StepGap
@@ -139,6 +142,10 @@ export function QuestDocumentEditor({
                       currentUser,
                       onUpdateStep,
                       onDeleteStep,
+                      onMoveUp: () => onMoveStep(quest.id, step.id, "up"),
+                      onMoveDown: () => onMoveStep(quest.id, step.id, "down"),
+                      canMoveUp: !isFirst,
+                      canMoveDown: !isLast,
                       onAddDialogue: onAddStepDialogue,
                       onUpdateDialogue: onUpdateStepDialogue,
                       onDeleteDialogue: onDeleteStepDialogue,

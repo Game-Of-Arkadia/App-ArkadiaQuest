@@ -11,6 +11,7 @@ export function CharacterSaysBlock({
   step, questId, characters, npcGroups, currentUser,
   onUpdateStep, onDeleteStep,
   onAddDialogue, onUpdateDialogue, onDeleteDialogue,
+  onMoveUp, onMoveDown, canMoveUp, canMoveDown,
 }: StepBlockProps) {
   const data = step.data as CharacterSaysData;
   const config = STEP_REGISTRY[step.type];
@@ -48,6 +49,10 @@ export function CharacterSaysBlock({
       borderColor={config.borderColor}
       bgColor={config.bgColor}
       onDelete={() => onDeleteStep(questId, step.id)}
+      onMoveUp={onMoveUp}
+      onMoveDown={onMoveDown}
+      canMoveUp={canMoveUp}
+      canMoveDown={canMoveDown}
     >
       <div className="flex items-center gap-1.5 flex-wrap">
         <span className="font-medium text-sm select-none" style={{ color: config.borderColor }}>→</span>

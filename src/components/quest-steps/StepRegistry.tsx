@@ -13,6 +13,10 @@ export interface StepBlockProps {
   currentUser: string;
   onUpdateStep: (questId: string, stepId: string, updates: Partial<QuestStep>) => void;
   onDeleteStep: (questId: string, stepId: string) => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
   onAddDialogue: (questId: string, stepId: string, dialogue: Dialogue) => void;
   onUpdateDialogue: (questId: string, stepId: string, dialogueId: string, updates: Partial<Dialogue>) => void;
   onDeleteDialogue: (questId: string, stepId: string, dialogueId: string) => void;

@@ -8,6 +8,7 @@ import type { GoSomewhereData } from "@/types/quest";
 
 export function GoSomewhereBlock({
   step, questId, currentUser, onUpdateStep, onDeleteStep,
+  onMoveUp, onMoveDown, canMoveUp, canMoveDown,
 }: StepBlockProps) {
   const data = step.data as GoSomewhereData;
   const config = STEP_REGISTRY[step.type];
@@ -17,6 +18,10 @@ export function GoSomewhereBlock({
       borderColor={config.borderColor}
       bgColor={config.bgColor}
       onDelete={() => onDeleteStep(questId, step.id)}
+      onMoveUp={onMoveUp}
+      onMoveDown={onMoveDown}
+      canMoveUp={canMoveUp}
+      canMoveDown={canMoveDown}
       isInteraction={config.isInteraction}
       interactionDescription={step.interactionDescription}
       onInteractionDescriptionChange={(v) => onUpdateStep(questId, step.id, { interactionDescription: v })}
