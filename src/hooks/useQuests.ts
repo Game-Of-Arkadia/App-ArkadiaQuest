@@ -109,6 +109,21 @@ export function useQuests() {
     );
   }, []);
 
+   const moveStep = useCallback((questId: string, stepId: string, direction: "up" | "down") => {
+    setQuests((prev) =>
+      prev.map((q) => {
+        if (q.id !== questId) return q;
+        const idx = q.steps.findIndex((s) => s.id === stepId);
+        if (idx < 0) return q;
+        const newIdx = direction === "up" ? idx - 1 : idx + 1;
+        if (newIdx < 0 || newIdx >= q.steps.length) return q;
+        const newSteps = [...q.steps];
+        [newSteps[idx], newSteps[newIdx]] = [newSteps[newIdx], newSteps[idx]];
+        return { ...q, steps: newSteps };
+      })
+    );
+  }, []);
+
   // Dialogues within steps
   const addStepDialogue = useCallback((questId: string, stepId: string, dialogue: Dialogue) => {
     setQuests((prev) =>
@@ -156,6 +171,7 @@ export function useQuests() {
     addStep,
     updateStep,
     deleteStep,
+    moveStep,
     addStepDialogue,
     updateStepDialogue,
     deleteStepDialogue,

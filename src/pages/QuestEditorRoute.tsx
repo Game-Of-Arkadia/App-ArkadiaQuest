@@ -23,6 +23,7 @@ export default function QuestEditorRoute() {
     addStep,
     updateStep,
     deleteStep,
+    moveStep,
     addStepDialogue,
     updateStepDialogue,
     deleteStepDialogue,
@@ -71,6 +72,7 @@ export default function QuestEditorRoute() {
           onAddStep={addStep}
           onUpdateStep={updateStep}
           onDeleteStep={deleteStep}
+          onMoveStep={moveStep}
           onAddStepDialogue={addStepDialogue}
           onUpdateStepDialogue={updateStepDialogue}
           onDeleteStepDialogue={deleteStepDialogue}

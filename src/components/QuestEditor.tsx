@@ -24,6 +24,7 @@ interface QuestEditorProps {
   onAddStep: (questId: string, step: QuestStep, atIndex?: number) => void;
   onUpdateStep: (questId: string, stepId: string, updates: Partial<QuestStep>) => void;
   onDeleteStep: (questId: string, stepId: string) => void;
+  onMoveStep: (questId: string, stepId: string, direction: "up" | "down") => void;
   onAddStepDialogue: (questId: string, stepId: string, dialogue: Dialogue) => void;
   onUpdateStepDialogue: (questId: string, stepId: string, dialogueId: string, updates: Partial<Dialogue>) => void;
   onDeleteStepDialogue: (questId: string, stepId: string, dialogueId: string) => void;
@@ -50,6 +51,7 @@ export function QuestEditor({
   onAddStep,
   onUpdateStep,
   onDeleteStep,
+  onMoveStep,
   onAddStepDialogue,
   onUpdateStepDialogue,
   onDeleteStepDialogue,
@@ -143,6 +145,7 @@ export function QuestEditor({
           onAddStep={onAddStep}
           onUpdateStep={onUpdateStep}
           onDeleteStep={onDeleteStep}
+          onMoveStep={onMoveStep}
           onAddStepDialogue={onAddStepDialogue}
           onUpdateStepDialogue={onUpdateStepDialogue}
           onDeleteStepDialogue={onDeleteStepDialogue}
