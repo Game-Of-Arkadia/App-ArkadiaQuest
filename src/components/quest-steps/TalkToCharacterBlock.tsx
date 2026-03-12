@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DialogueLine } from "./DialogueLine";
 import { StepBlockWrapper } from "./StepBlockWrapper";
 import { STEP_REGISTRY } from "./StepRegistry";
+import { NpcHeadIcon } from "@/components/NpcHeadIcon";
 import type { StepBlockProps } from "./StepRegistry";
 import type { TalkToCharacterData } from "@/types/quest";
 
@@ -60,9 +61,24 @@ export function TalkToCharacterBlock({
       <div className="flex items-center gap-1.5 flex-wrap">
         <span className="font-medium text-sm select-none" style={{ color: config.borderColor }}>→ Parler à</span>
         <Select value={data.characterId || ""} onValueChange={(v) => onUpdateStep(questId, step.id, { data: { ...data, characterId: v } })}>
-          <SelectTrigger className="h-6 text-xs w-36 border-dashed bg-background/60"><SelectValue placeholder="" /></SelectTrigger>
+          <SelectTrigger className="h-6 text-xs w-auto min-w-[9rem] border-dashed bg-background/60 inline-flex">
+            <SelectValue placeholder=""/>
+          </SelectTrigger>
           <SelectContent>
-            {filteredCharacters.map((c) => <SelectItem key={c.id} value={c.id}>{c.name} ({c.npcCode})</SelectItem>)}
+            {filteredCharacters.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                <span className="inline-flex items-center gap-1.5">
+                  {c.textureUrl &&
+                      <NpcHeadIcon
+                        textureUrl={c.textureUrl}
+                        size={24}
+                        className="rounded-sm hover:ring-1 hover:ring-primary transition-shadow"
+                      />
+                    }
+                  {c.name}
+                </span>
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <span className="font-medium text-sm select-none" style={{ color: config.borderColor }}>de</span>
