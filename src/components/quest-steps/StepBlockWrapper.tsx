@@ -24,9 +24,18 @@ export function StepBlockWrapper({
   children
 }: StepBlockWrapperProps) {
   const descEmpty = isInteraction && (!interactionDescription || interactionDescription.trim() === "");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const autoResize = useCallback(() => {
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = el.scrollHeight + "px";
+    }
+  }, []);
+  useEffect(() => { autoResize(); }, [interactionDescription, autoResize]);
   return (
     <div
-      className="group/event relative rounded-r-md py-2 px-3 my-2"
+      className="group/event relative rounded-r-md py-1.5 px-3 my-0.5 flex"
       style={{ borderLeft: `2px solid ${borderColor}`, backgroundColor: bgColor }}
     >
       <div className="flex flex-col gap-0.5 mr-1.5 opacity-0 group-hover/event:opacity-100 transition-opacity shrink-0 pt-0.5">
