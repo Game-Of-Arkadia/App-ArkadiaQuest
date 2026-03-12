@@ -37,17 +37,44 @@ interface DialogueLineProps {
 }
 
 export function DialogueLine({ dialogue, onUpdate, onDelete }: DialogueLineProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const autoResize = useCallback(() => {
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = el.scrollHeight + "px";
+    }
+  }, []);
+  useEffect(() => { autoResize(); }, [dialogue.text, autoResize]);
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onUpdate({ text: e.target.value });
+  };
+  const handleBlur = () => {
+    const wrapped = wordWrapText(dialogue.text);
+    if (wrapped !== dialogue.text) {
+      onUpdate({ text: wrapped });
+    }
+  };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && e.shiftKey) {
+      return;
+    }
+    if (e.key === "Enter" && !e.shiftKey) {
+    }
+  };
 
   return (
     <div className="group/line flex items-start gap-1 pl-6 py-0.5">
-      <span className="text-muted-foreground select-none mt-1 text-sm font-mono">-</span>
-      <input
-        ref={inputRef}
-        className="flex-1 bg-transparent border-none outline-none text-sm py-0.5 text-foreground placeholder:text-muted-foreground/50"
+      <span className="text-muted-foreground select-none mt-1 font-mono">-</span>
+      <textarea
+        ref={textareaRef}
+        className="flex-1 bg-transparent border-none outline-none text-base py-0.5 text-foreground placeholder:text-muted-foreground/50 resize-none overflow-hidden leading-snug"
         value={dialogue.text}
-        onChange={(e) => onUpdate({ text: e.target.value })}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
         placeholder="Texte du dialogue..."
+        rows={1}
       />
       <Button
         variant="ghost"
