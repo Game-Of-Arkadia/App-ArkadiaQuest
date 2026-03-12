@@ -1,7 +1,33 @@
-import { useRef } from "react";
+import { useRef, useCallback, useEffect } from "react";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Dialogue, Character } from "@/types/quest";
+
+const LINE_CHAR_LIMIT = 37;
+
+function wordWrapText(text: string): string {
+  const paragraphs = text.split("\n");
+  return paragraphs
+    .map((paragraph) => {
+      const words = paragraph.split(" ");
+      let currentLine = "";
+      const lines: string[] = [];
+      for (const word of words) {
+        if (currentLine.length === 0) {
+          currentLine = word;
+        } else if (currentLine.length + 1 + word.length <= LINE_CHAR_LIMIT) {
+          currentLine += " " + word;
+        } else {
+          lines.push(currentLine);
+          currentLine = word;
+        }
+      }
+      if (currentLine) lines.push(currentLine);
+      return lines.join("\n");
+    })
+    .join("\n");
+}
+
 
 interface DialogueLineProps {
   dialogue: Dialogue;
