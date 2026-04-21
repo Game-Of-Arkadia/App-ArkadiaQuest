@@ -1,55 +1,47 @@
-import { useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
-import { QuestDashboard } from "@/components/QuestDashboard";
-import type { AppSection } from "@/components/AppHeader";
-import { LoginScreen } from "@/components/LoginScreen";
 import { GroupFormModal } from "@/components/GroupFormModal";
-import { QuestFormModal } from "@/components/QuestFormModal";
+import { LoginScreen } from "@/components/LoginScreen";
 import { NpcDashboard } from "@/components/NpcDashboard";
 import { useCharacters } from "@/hooks/useCharacters";
-import { useQuests } from "@/hooks/useQuests";
 import { useUser } from "@/hooks/useUser";
-import type { Quest } from "@/types/quest";
+import { useEffect, useState } from "react";
+import { SYSTEM_NPC_GROUP_ID } from "@/types/quest";
 
 const Index = () => {
   const { currentUser, users, login, logout } = useUser();
-  const [activeSection, setActiveSection] = useState<AppSection>("quests");
-  const [charactersOpen, setCharactersOpen] = useState(false);
-  const [questModalOpen, setQuestModalOpen] = useState(false);
-  const [questModalGroupId, setQuestModalGroupId] = useState("");
+  const { characters, addCharacter, updateCharacter, deleteCharacter, npcGroups, addNpcGroup } = useCharacters();
+  const [selectedGroupId, setSelectedGroupId] = useState<string>(SYSTEM_NPC_GROUP_ID);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
 
-  const { characters, addCharacter, updateCharacter, deleteCharacter, npcGroups, addNpcGroup, deleteNpcGroup } = useCharacters();  const {
-    groups,
-    quests,
-    addGroup,
-    renameGroup,
-    deleteGroup,
-    addQuest,
-    updateQuest,
-    deleteQuest,
-  } = useQuests();
+  useEffect(() => {
+    if (npcGroups.length === 0) return;
+    if (npcGroups.some((group) => group.id === selectedGroupId)) return;
 
-  const handleOpenCreateQuest = (groupId: string) => {
-    setQuestModalGroupId(groupId);
-    setQuestModalOpen(true);
-  };
+    const systemGroup = npcGroups.find((group) => group.id === SYSTEM_NPC_GROUP_ID);
+    setSelectedGroupId(systemGroup?.id ?? npcGroups[0].id);
+  }, [npcGroups, selectedGroupId]);
 
-  const handleQuestFormSubmit = (data: {
-    id: string;
-    name: string;
-    description: string;
-    startingCharacterId: string;
-    requirements: Quest["requirements"];
-    groupId: string;
-  }) => {
-    addQuest({
-      ...data,
-      steps: [],
-      status: "to_do",
-      referent: "",
-      writer: "",
-      notes: [],
+  const handleAddNpc = () => {
+    let maxNum = 0;
+    for (const character of characters) {
+      const numericId = parseInt(character.characterId, 10);
+      if (!Number.isNaN(numericId) && numericId > maxNum) maxNum = numericId;
+    }
+
+    addCharacter({
+      id: crypto.randomUUID(),
+      name: "PNJ",
+      characterId: String(maxNum + 1),
+      npcCode: "",
+      imagePath: "",
+      textureUrl: "",
+      gender: "male",
+      x: 0,
+      y: 0,
+      z: 0,
+      otherInfo: [],
+      yamlConfig: "",
+      groupId: selectedGroupId,
     });
   };
 
@@ -61,51 +53,29 @@ const Index = () => {
     <div className="flex flex-col h-screen bg-background">
       <AppHeader
         currentUser={currentUser}
-        activeSection={activeSection}
-        onChangeSection={setActiveSection}
+        npcGroups={npcGroups}
+        selectedGroupId={selectedGroupId}
+        onSelectGroup={setSelectedGroupId}
+        onAddGroup={() => setGroupModalOpen(true)}
+        onAddNpc={handleAddNpc}
         onLogout={logout}
       />
 
-      {activeSection === "quests" && (
-        <QuestDashboard
-          groups={groups}
-          quests={quests}
-          onCreateQuest={handleOpenCreateQuest}
-          onDeleteQuest={deleteQuest}
-          onOpenGroupModal={() => setGroupModalOpen(true)}
+      <div className="flex flex-1 min-h-0">
+        <NpcDashboard
+          characters={characters}
+          npcGroups={npcGroups}
+          onUpdate={updateCharacter}
+          onDelete={deleteCharacter}
+          selectedGroupId={selectedGroupId}
         />
-      )}
-      {activeSection === "npcs" && (
-        <div className="flex flex-1 min-h-0">
-          <NpcDashboard
-            characters={characters}
-            npcGroups={npcGroups}
-            onAdd={addCharacter}
-            onUpdate={updateCharacter}
-            onDelete={deleteCharacter}
-            onAddGroup={addNpcGroup}
-            onDeleteGroup={deleteNpcGroup}
-          />
-        </div>
-      )}
+      </div>
 
       <GroupFormModal
         open={groupModalOpen}
         onOpenChange={setGroupModalOpen}
-        onSubmit={({ name }) => addGroup({ id: crypto.randomUUID(), name })}
+        onSubmit={({ name }) => addNpcGroup({ id: crypto.randomUUID(), name })}
       />
-
-      {questModalGroupId && (
-        <QuestFormModal
-          open={questModalOpen}
-          onOpenChange={setQuestModalOpen}
-          groupId={questModalGroupId}
-          groups={groups}
-          characters={characters}
-          quests={quests}
-          onSubmit={handleQuestFormSubmit}
-        />
-      )}
     </div>
   );
 };

@@ -14,19 +14,14 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { CoordinatesInput } from "@/components/CoordinatesInput";
 import { NpcHeadIcon } from "@/components/NpcHeadIcon";
 import { NpcFullBodyIcon, validateMinecraftSkin } from "@/components/NpcFullBodyIcon";
-import { GroupFormModal } from "@/components/GroupFormModal";
-import { cn } from "@/lib/utils";
 import type { Character, CharacterGender, NpcGroup } from "@/types/quest";
-import { SYSTEM_NPC_GROUP_ID } from "@/types/quest";
 
 interface NpcDashboardProps {
   characters: Character[];
   npcGroups: NpcGroup[];
-  onAdd: (char: Character) => void;
   onUpdate: (id: string, updates: Partial<Character>) => void;
   onDelete: (id: string) => void;
-  onAddGroup: (group: NpcGroup) => void;
-  onDeleteGroup: (id: string) => void;
+  selectedGroupId: string;
 }
 
 function TpButton({ x, y, z }: { x: number; y: number; z: number }) {
@@ -43,14 +38,12 @@ function TpButton({ x, y, z }: { x: number; y: number; z: number }) {
   );
 }
 
-export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete, onAddGroup, onDeleteGroup }: NpcDashboardProps) {
+export function NpcDashboard({ characters, npcGroups, onUpdate, onDelete, selectedGroupId }: NpcDashboardProps) {
   const navigate = useNavigate();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [previewTextureUrl, setPreviewTextureUrl] = useState<string>("");
   const [isValidUrl, setIsValid] = useState<boolean | null>(null);
-  const [selectedGroupId, setSelectedGroupId] = useState<string>(SYSTEM_NPC_GROUP_ID);
-  const [groupModalOpen, setGroupModalOpen] = useState(false);
   const editingChar = characters.find((c) => c.id === editingId) ?? null;
 
   const filteredCharacters = characters.filter((c) => c.groupId === selectedGroupId);
@@ -63,27 +56,6 @@ export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete,
     if (!url) return;
     setPreviewTextureUrl(url);
     setPreviewModalOpen(true);
-  };
-  const handleNew = () => {
-    let maxNum = 0;
-    for (const c of characters) {
-      const n = parseInt(c.characterId, 10);
-      if (!isNaN(n) && n > maxNum) maxNum = n;
-    }
-    const newChar: Character = {
-      id: crypto.randomUUID(),
-      name: "PNJ",
-      characterId: String(maxNum + 1),
-      npcCode: "",
-      imagePath: "",
-      textureUrl: "",
-      gender: "male",
-      x: 0, y: 0, z: 0,
-      otherInfo: [],
-      yamlConfig: "",
-      groupId: selectedGroupId,
-    };
-    onAdd(newChar);
   };
   const isSeed = (id: string) => id === "__default__" || id === "__ambiant__";
 
@@ -114,35 +86,6 @@ export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete,
 
   return (
     <div className="flex-1 flex flex-col min-h-0 p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Dashboard PNJ</h2>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => setGroupModalOpen(true)}>
-            <Plus className="h-3 w-3 mr-1" /> Group
-          </Button>
-          {npcGroups.map((g) => (
-            <div key={g.id} className="flex items-center gap-1">
-              <button
-                key={g.id}
-                onClick={() => setSelectedGroupId(g.id)}
-                className={cn(
-                  "px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
-                  selectedGroupId === g.id
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}
-              >
-                {g.name}
-              </button>
-        </div>
-          ))}
-        </div>
-        <Button variant="outline" size="sm" className="text-xs" onClick={handleNew}>
-          <Plus className="h-3 w-3 mr-1" /> Nouveau PNJ
-        </Button>
-      </div>
-      <div className="flex items-center justify-between mb-2"></div>
-
       <ScrollArea className="flex-1">
         <Table>
           <TableHeader>
@@ -483,11 +426,6 @@ export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete,
           )}
         </DialogContent>
       </Dialog>
-      <GroupFormModal
-        open={groupModalOpen}
-        onOpenChange={setGroupModalOpen}
-        onSubmit={({ name }) => onAddGroup({ id: crypto.randomUUID(), name })}
-      />
     </div>
   );
 }

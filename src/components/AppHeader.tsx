@@ -1,33 +1,34 @@
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { ArrowLeft, LogOut } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { NpcGroup } from "@/types/quest";
 
 interface AppHeaderProps {
   currentUser: string;
-  activeSection: AppSection;
-  onChangeSection: (section: AppSection) => void;
   onLogout: () => void;
-}
-
-export type AppSection = "quests" | "npcs";
-export const APP_SECTIONS: { id: AppSection; label: string }[] = [
-  { id: "quests", label: "Dashboard Quêtes" },
-  { id: "npcs", label: "PNJ d'Arkadia" },
-];
-
-interface AppHeaderProps {
-  currentUser: string;
-  activeSection: AppSection;
-  onChangeSection: (section: AppSection) => void;
-  onLogout: () => void;
+  npcGroups?: NpcGroup[];
+  selectedGroupId?: string;
+  onSelectGroup?: (groupId: string) => void;
+  onAddGroup?: () => void;
+  onAddNpc?: () => void;
   backButtonLabel?: string;
   onBack?: () => void;
 }
 
-export function AppHeader({ currentUser, activeSection, onChangeSection, onLogout, backButtonLabel, onBack }: AppHeaderProps) {
+export function AppHeader({
+  currentUser,
+  onLogout,
+  npcGroups,
+  selectedGroupId,
+  onSelectGroup,
+  onAddGroup,
+  onAddNpc,
+  backButtonLabel,
+  onBack,
+}: AppHeaderProps) {
   const showBackButton = !!backButtonLabel && !!onBack;
   return (
-    <header className="h-12 flex items-center justify-between border-b px-4 bg-background shrink-0">
+    <header className="h-14 flex items-center gap-4 border-b px-4 bg-background shrink-0">
       <div className="flex items-center gap-2">
         {showBackButton && (
           <Button
@@ -44,26 +45,34 @@ export function AppHeader({ currentUser, activeSection, onChangeSection, onLogou
         </h1>
       </div>
 
-      {!showBackButton && (
-        <nav className="flex items-center gap-1">
-          {APP_SECTIONS.map((s) => (
+      {!showBackButton && npcGroups && npcGroups.length > 0 && (
+        <div className="flex flex-1 items-center justify-center gap-2 min-w-0 overflow-x-auto">
+          <Button variant="outline" size="sm" className="h-8 text-xs shrink-0" onClick={onAddGroup}>
+            + Group
+          </Button>
+          {npcGroups.map((group) => (
             <button
-              key={s.id}
-              onClick={() => onChangeSection(s.id)}
+              key={group.id}
+              onClick={() => onSelectGroup?.(group.id)}
               className={cn(
-                "px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
-                activeSection === s.id
+                "px-3 py-1.5 text-xs font-medium rounded-md transition-colors shrink-0",
+                selectedGroupId === group.id
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              {s.label}
+              {group.name}
             </button>
           ))}
-        </nav>
+        </div>
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
+        {!showBackButton && (
+          <Button variant="outline" size="sm" className="h-8 text-xs shrink-0" onClick={onAddNpc}>
+            + Nouveau PNJ
+          </Button>
+        )}
         <span className="text-xs text-muted-foreground">
           {currentUser}
         </span>
