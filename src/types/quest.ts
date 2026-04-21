@@ -14,7 +14,29 @@ export interface Character {
   otherInfo: string[];
   yamlConfig: string;
   groupId: string;
+  nodes?: NpcNode[];
 }
+
+export interface NpcDialogueNode {
+  id: string;
+  kind: "dialogue";
+  position: { x: number; y: number };
+  filename?: string;
+  condition?: string;
+  text: string;
+}
+
+export interface NpcQuestNode {
+  id: string;
+  kind: "quest";
+  position: { x: number; y: number };
+  questId: string;
+  questName: string;
+  googleDocLink?: string;
+  additionalInfo?: string;
+}
+
+export type NpcNode = NpcDialogueNode | NpcQuestNode;
 
 export interface NpcGroup {
   id: string;
