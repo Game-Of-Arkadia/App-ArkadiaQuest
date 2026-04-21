@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Plus, Pencil, Trash2, User, AlertCircle, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +44,7 @@ function TpButton({ x, y, z }: { x: number; y: number; z: number }) {
 }
 
 export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete, onAddGroup, onDeleteGroup }: NpcDashboardProps) {
+  const navigate = useNavigate();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [previewTextureUrl, setPreviewTextureUrl] = useState<string>("");
@@ -50,6 +52,7 @@ export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete,
   const [selectedGroupId, setSelectedGroupId] = useState<string>(SYSTEM_NPC_GROUP_ID);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
   const editingChar = characters.find((c) => c.id === editingId) ?? null;
+
   const filteredCharacters = characters.filter((c) => c.groupId === selectedGroupId);
   const genderBg = (c: Character) => {
     if (c.gender === "male") return "bg-blue-100 text-blue-800";
@@ -162,10 +165,22 @@ export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete,
                 </TableCell>
               </TableRow>
             ) : (
-              filteredCharacters.map((c) => (
-                <TableRow key={c.id}>
+              filteredCharacters.map((c) => {
+                const handleRowClick = (e: React.MouseEvent) => {
+                  // Don't navigate if click came from any interactive element
+                  const target = e.target as HTMLElement;
+                  if (target.closest("input, button, select, textarea, [role='combobox']")) return;
+                  if (!c.npcCode) return;
+                  navigate(`/npc/${encodeURIComponent(c.npcCode)}`);
+                };
+                return (
+                <TableRow
+                  key={c.id}
+                  onClick={handleRowClick}
+                  className={c.npcCode ? "cursor-pointer hover:bg-muted/50" : ""}
+                >
                   <TableCell className="p-1">
-                    <div className="cursor-pointer" onClick={() => openFullBodyPreview(c.textureUrl)}>
+                    <div className="cursor-pointer" onClick={(e) => { e.stopPropagation(); openFullBodyPreview(c.textureUrl); }}>
                       <NpcHeadIcon
                         textureUrl={c.textureUrl}
                         size={24}
@@ -246,7 +261,8 @@ export function NpcDashboard({ characters, npcGroups, onAdd, onUpdate, onDelete,
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
+                );
+              })
             )}
           </TableBody>
         </Table>
